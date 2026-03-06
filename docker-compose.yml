@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - '5000:5000'
+    env_file:
+      - ./backend/.env
+    environment:
+      # Allow any origin — nginx is the only public entry point so this is safe
+      - CLIENT_URL=*
+    restart: always
+    networks:
+      - ecommerce-network
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - '80:80'
+    restart: always
+    networks:
+      - ecommerce-network
+    depends_on:
+      - backend
+
+networks:
+  ecommerce-network:
+    driver: bridge
