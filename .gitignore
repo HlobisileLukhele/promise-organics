@@ -1,9 +1,18 @@
+# Dependencies
 node_modules/
+
+# Environment files — NEVER commit these
 .env
 .env.local
 .env.*.local
+.env.test
+.env.production
+
+# Dist / build
 dist/
 build/
+
+# OS
 .DS_Store
 
 # Test coverage
