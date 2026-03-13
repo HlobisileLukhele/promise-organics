@@ -76,7 +76,22 @@ export const getUserOrders = async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('orders')
-      .select('id, total_amount, status, created_at')
+      .select(`
+        id,
+        total_amount,
+        status,
+        created_at,
+        order_items (
+          id,
+          quantity,
+          price,
+          products:product_id (
+            id,
+            name,
+            image_url
+          )
+        )
+      `)
       .eq('user_id', req.user.id)
       .order('created_at', { ascending: false });
 
@@ -105,15 +120,24 @@ export const getOrderById = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Order not found.' });
     }
 
-    // Fetch order items for this order
-    const { data: items, error: itemsError } = await supabase
+    // Fetch order items with product names
+    const { data: order_items, error: itemsError } = await supabase
       .from('order_items')
-      .select('id, product_id, quantity, price')
+      .select(`
+        id,
+        quantity,
+        price,
+        products:product_id (
+          id,
+          name,
+          image_url
+        )
+      `)
       .eq('order_id', order.id);
 
     if (itemsError) throw itemsError;
 
-    res.json({ success: true, data: { ...order, items } });
+    res.json({ success: true, data: { ...order, order_items } });
   } catch (err) {
     next(err);
   }

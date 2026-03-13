@@ -4,7 +4,7 @@ export const getAllProducts = async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('products')
-      .select('*')
+      .select('*, ingredients, directions')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -18,7 +18,7 @@ export const getProductById = async (req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('products')
-      .select('*')
+      .select('*, ingredients, directions')
       .eq('id', req.params.id)
       .single();
 

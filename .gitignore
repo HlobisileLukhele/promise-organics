@@ -5,3 +5,15 @@ node_modules/
 dist/
 build/
 .DS_Store
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/

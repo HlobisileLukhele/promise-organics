@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useUserStore } from "@/store/userStore"
+import promiseLogo from "@/assets/promise-logo.png"
 
 const SignIn = () => {
   const [form, setForm] = useState({ email: '', password: '' })
@@ -20,11 +21,21 @@ const SignIn = () => {
   }
 
   return (
-    <section className="flex flex-col items-center bg-[#ebecf1] justify-center md:h-screen h-svh">
-      <div className="bg-white p-6 w-11/12 lg:w-1/3 mx-auto h-auto rounded-md shadow-sm">
+    <section className="flex flex-col items-center bg-[#ebecf1] dark:bg-[#0f1f17] justify-center md:h-screen h-svh">
+      <div className="bg-white dark:bg-[#1e3d2a] p-6 w-11/12 lg:w-1/3 mx-auto h-auto rounded-md shadow-sm dark:shadow-[#0a1510]">
+        <Link
+          to="/"
+          className="flex items-center gap-1 text-sm text-gray-500 dark:text-[#7a9e85] hover:text-green-700 dark:hover:text-[#4a7c59] transition-colors mb-6"
+        >
+          ← Back to Home
+        </Link>
+
         <div className="text-center mb-8">
-          <h4 className="text-3xl font-semibold my-3 title">Welcome back</h4>
-          <p className="text-gray-500 text-sm">Sign in to your Promise Organics account</p>
+          <Link to="/">
+            <img src={promiseLogo} alt="Promise Organics" className="h-10 mx-auto mb-4 object-contain" />
+          </Link>
+          <h4 className="text-3xl font-semibold my-3 title dark:text-[#f0f7f2]">Welcome back</h4>
+          <p className="text-gray-500 dark:text-[#7a9e85] text-sm">Sign in to your Promise Organics account</p>
         </div>
 
         {error && (
@@ -42,7 +53,7 @@ const SignIn = () => {
             value={form.email}
             onChange={handleChange}
             required
-            className="border border-gray-200 block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60"
+            className="border border-gray-200 dark:border-[#2d5a3d] dark:bg-[#162d20] dark:text-[#f0f7f2] dark:placeholder-[#7a9e85] block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60"
           />
 
           <div className="flex items-center justify-between mt-1">
@@ -56,7 +67,7 @@ const SignIn = () => {
             value={form.password}
             onChange={handleChange}
             required
-            className="border border-gray-200 block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60"
+            className="border border-gray-200 dark:border-[#2d5a3d] dark:bg-[#162d20] dark:text-[#f0f7f2] dark:placeholder-[#7a9e85] block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60"
           />
 
           <button
@@ -68,7 +79,7 @@ const SignIn = () => {
           </button>
         </form>
 
-        <p className="text-center my-4 text-sm">
+        <p className="text-center my-4 text-sm dark:text-[#c8dece]">
           Don't have an account?{' '}
           <Link to="/register" className="text-[#7c8c7d] font-medium hover:underline">Create an account</Link>
         </p>

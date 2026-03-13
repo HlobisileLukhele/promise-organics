@@ -1,11 +1,21 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.zoho.com',
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+});
+
+transporter.verify((error) => {
+  if (error) {
+    console.error('Email transporter error:', error.message);
+  } else {
+    console.log('Email server ready ✅');
+  }
 });
 
 // POST /api/contact
@@ -19,7 +29,7 @@ export const sendContactEnquiry = async (req, res) => {
   try {
     // Notification email to the business
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: '"Promise Organics" <sales@promiseorganics.co.za>',
       to:   process.env.CONTACT_RECEIVER_EMAIL,
       subject: `New Enquiry: ${subject}`,
       html: `
@@ -37,7 +47,7 @@ export const sendContactEnquiry = async (req, res) => {
 
     // Auto-reply to the customer
     await transporter.sendMail({
-      from:    process.env.EMAIL_USER,
+      from:    '"Promise Organics" <sales@promiseorganics.co.za>',
       to:      email,
       subject: 'Thanks for contacting Promise Organics',
       html: `
@@ -49,8 +59,13 @@ export const sendContactEnquiry = async (req, res) => {
     });
 
     res.json({ success: true, message: 'Enquiry sent successfully' });
-  } catch (err) {
-    console.error('Contact email error:', err.message);
-    res.status(500).json({ success: false, message: 'Failed to send enquiry' });
+  } catch (error) {
+    console.error('Email error details:', {
+      message:  error.message,
+      code:     error.code,
+      command:  error.command,
+      response: error.response,
+    });
+    res.status(500).json({ success: false, message: 'Failed to send enquiry', error: error.message });
   }
 };

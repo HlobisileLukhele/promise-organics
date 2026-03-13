@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useUserStore } from "@/store/userStore"
+import promiseLogo from "@/assets/promise-logo.png"
 
 const SignUp = () => {
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', confirm: '' })
@@ -37,11 +38,21 @@ const SignUp = () => {
   }
 
   return (
-    <section className="flex flex-col items-center bg-[#ebecf1] justify-center min-h-screen py-10">
-      <div className="bg-white p-6 w-11/12 lg:w-1/3 mx-auto h-auto rounded-md shadow-sm">
+    <section className="flex flex-col items-center bg-[#ebecf1] dark:bg-[#0f1f17] justify-center min-h-screen py-10">
+      <div className="bg-white dark:bg-[#1e3d2a] p-6 w-11/12 lg:w-1/3 mx-auto h-auto rounded-md shadow-sm dark:shadow-[#0a1510]">
+        <Link
+          to="/"
+          className="flex items-center gap-1 text-sm text-gray-500 dark:text-[#7a9e85] hover:text-green-700 dark:hover:text-[#4a7c59] transition-colors mb-6"
+        >
+          ← Back to Home
+        </Link>
+
         <div className="text-center mb-8">
-          <h4 className="text-2xl font-semibold my-3">Create an account</h4>
-          <p className="text-gray-500 text-sm">Join us for a better shopping experience</p>
+          <Link to="/">
+            <img src={promiseLogo} alt="Promise Organics" className="h-10 mx-auto mb-4 object-contain" />
+          </Link>
+          <h4 className="text-2xl font-semibold my-3 dark:text-[#f0f7f2]">Create an account</h4>
+          <p className="text-gray-500 dark:text-[#7a9e85] text-sm">Join us for a better shopping experience</p>
         </div>
 
         {error && (
@@ -53,7 +64,7 @@ const SignUp = () => {
         <form onSubmit={handleSubmit}>
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="font-semibold opacity-70 text-sm">First Name</label>
+              <label className="font-semibold opacity-70 text-sm dark:text-[#c8dece]">First Name</label>
               <input
                 type="text"
                 name="firstName"
@@ -61,7 +72,7 @@ const SignUp = () => {
                 value={form.firstName}
                 onChange={handleChange}
                 required
-                className="border border-gray-200 block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60"
+                className="border border-gray-200 dark:border-[#2d5a3d] dark:bg-[#162d20] dark:text-[#f0f7f2] dark:placeholder-[#7a9e85] block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60"
               />
             </div>
             <div className="flex-1">
@@ -73,7 +84,7 @@ const SignUp = () => {
                 value={form.lastName}
                 onChange={handleChange}
                 required
-                className="border border-gray-200 block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60"
+                className="border border-gray-200 dark:border-[#2d5a3d] dark:bg-[#162d20] dark:text-[#f0f7f2] dark:placeholder-[#7a9e85] block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60"
               />
             </div>
           </div>
@@ -120,7 +131,7 @@ const SignUp = () => {
           </button>
         </form>
 
-        <p className="text-center my-4 text-sm">
+        <p className="text-center my-4 text-sm dark:text-[#c8dece]">
           Already have an account?{' '}
           <Link to="/login" className="text-[#7c8c7d] font-medium hover:underline">Sign in</Link>
         </p>

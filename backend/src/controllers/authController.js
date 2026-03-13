@@ -59,7 +59,7 @@ export const login = async (req, res, next) => {
     // Fetch user including password_hash for comparison
     const { data: user, error } = await supabase
       .from('users')
-      .select('id, full_name, email, password_hash, created_at')
+      .select('id, full_name, email, role, password_hash, created_at')
       .eq('email', email)
       .single();
 
@@ -76,7 +76,7 @@ export const login = async (req, res, next) => {
 
     // Never send password_hash to the client
     const { password_hash, ...safeUser } = user;
-    res.json({ success: true, token, user: safeUser });
+    res.json({ success: true, token, user: { ...safeUser, is_admin: safeUser.role === 'admin' } });
   } catch (err) {
     next(err);
   }

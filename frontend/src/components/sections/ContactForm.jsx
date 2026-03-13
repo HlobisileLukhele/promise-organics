@@ -20,32 +20,37 @@ export default function ContactForm() {
     setSuccessMessage('');
     setErrorMessage('');
 
+    const { name, email, phone, subject, message } = formData;
+    console.log('Sending contact form:', { name, email, subject, message });
+
     try {
-      const res = await fetch(`${API}/api/contact`, {
+      const res = await fetch('http://localhost:5000/api/contact', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(formData),
+        body:    JSON.stringify({ name, email, phone, subject, message }),
       });
       const data = await res.json();
+      console.log('Contact form response:', data);
 
-      if (res.ok && data.success) {
+      if (data.success) {
         setSuccessMessage("Thank you! We'll get back to you within 24 hours.");
         setFormData(INITIAL);
       } else {
         setErrorMessage(data.message || 'Something went wrong. Please try again.');
       }
-    } catch {
-      setErrorMessage('Something went wrong. Please try again.');
+    } catch (err) {
+      console.error('Contact form error:', err);
+      setErrorMessage('Network error. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const inputClass =
-    'w-full px-5 py-3.5 rounded-full border border-gray-300 bg-stone-50 focus:outline-none focus:border-[#8B9D83] focus:ring-2 focus:ring-[#8B9D83]/20 transition-all placeholder:text-gray-400';
+    'w-full px-5 py-3.5 rounded-full border border-gray-300 dark:border-[#2d5a3d] bg-stone-50 dark:bg-[#162d20] dark:text-[#f0f7f2] focus:outline-none focus:border-[#8B9D83] focus:ring-2 focus:ring-[#8B9D83]/20 transition-all placeholder:text-gray-400 dark:placeholder:text-[#7a9e85]';
 
   return (
-    <div className="w-full md:w-1/2 bg-white p-8 md:p-10 rounded-3xl shadow-lg border border-gray-100">
+    <div className="w-full md:w-1/2 bg-white dark:bg-[#1e3d2a] p-8 md:p-10 rounded-3xl shadow-lg border border-gray-100 dark:border-[#2d5a3d]">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
@@ -55,7 +60,7 @@ export default function ContactForm() {
               <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
             </svg>
           </div>
-          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">Get In Touch</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-[#f0f7f2]">Get In Touch</h2>
         </div>
         <div className="w-16 h-0.5 bg-gradient-to-r from-[#8B9D83] to-transparent"></div>
       </div>
@@ -63,7 +68,7 @@ export default function ContactForm() {
       <form className="space-y-5" onSubmit={handleSubmit}>
         {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-[#c8dece] mb-2">Name</label>
           <input
             type="text"
             name="name"
@@ -77,7 +82,7 @@ export default function ContactForm() {
 
         {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-[#c8dece] mb-2">Email</label>
           <input
             type="email"
             name="email"
@@ -91,8 +96,8 @@ export default function ContactForm() {
 
         {/* Phone */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Phone <span className="text-gray-400 font-normal">(optional)</span>
+          <label className="block text-sm font-medium text-gray-700 dark:text-[#c8dece] mb-2">
+            Phone <span className="text-gray-400 dark:text-[#7a9e85] font-normal">(optional)</span>
           </label>
           <input
             type="tel"
@@ -106,7 +111,7 @@ export default function ContactForm() {
 
         {/* Subject */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-[#c8dece] mb-2">Subject</label>
           <input
             type="text"
             name="subject"
@@ -120,7 +125,7 @@ export default function ContactForm() {
 
         {/* Message */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-[#c8dece] mb-2">Message</label>
           <textarea
             name="message"
             value={formData.message}
@@ -128,7 +133,7 @@ export default function ContactForm() {
             rows="5"
             placeholder="Tell us how we can help you..."
             required
-            className="w-full px-5 py-3.5 rounded-3xl border border-gray-300 bg-stone-50 focus:outline-none focus:border-[#8B9D83] focus:ring-2 focus:ring-[#8B9D83]/20 transition-all resize-none placeholder:text-gray-400"
+            className="w-full px-5 py-3.5 rounded-3xl border border-gray-300 dark:border-[#2d5a3d] bg-stone-50 dark:bg-[#162d20] dark:text-[#f0f7f2] focus:outline-none focus:border-[#8B9D83] focus:ring-2 focus:ring-[#8B9D83]/20 transition-all resize-none placeholder:text-gray-400 dark:placeholder:text-[#7a9e85]"
           />
         </div>
 
@@ -139,9 +144,9 @@ export default function ContactForm() {
           </p>
         )}
         {errorMessage && (
-          <p className="text-rose-600 bg-rose-50 border border-rose-200 rounded-2xl px-4 py-3 text-sm text-center">
+          <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm text-center">
             {errorMessage}
-          </p>
+          </div>
         )}
 
         {/* Submit button */}

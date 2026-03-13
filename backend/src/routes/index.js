@@ -9,6 +9,9 @@ import paymentRoutes from './payment.js';
 import healthRoutes  from './health.js';
 import chatRoutes    from './chat.js';
 import contactRoutes from './contact.js';
+import reviewsRoutes from './reviews.js';
+import adminRoutes   from './admin.js';
+import blogRoutes    from './blog.js';
 
 const router = Router();
 
@@ -22,5 +25,8 @@ router.use('/payment',  paymentRoutes);
 router.use('/health',   healthRoutes);
 router.use('/chat',     chatRoutes);
 router.use('/contact',  contactRoutes);
+router.use('/reviews',  reviewsRoutes);
+router.use('/admin',    adminRoutes);
+router.use('/blog',     blogRoutes);
 
 export default router;

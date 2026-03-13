@@ -52,7 +52,7 @@ export default function FAQs() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-stone-50 to-white p-8 md:p-10 rounded-3xl shadow-lg border border-gray-100 mt-10">
+    <div className="bg-gradient-to-br from-stone-50 to-white dark:from-[#0f1f17] dark:to-[#162d20] p-8 md:p-10 rounded-3xl shadow-lg border border-gray-100 dark:border-[#2d5a3d] mt-10">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
@@ -61,10 +61,10 @@ export default function FAQs() {
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
             </svg>
           </div>
-          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">Frequently Asked Questions</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-[#f0f7f2]">Frequently Asked Questions</h2>
         </div>
         <div className="w-16 h-0.5 bg-gradient-to-r from-[#8B9D83] to-transparent mb-2"></div>
-        <p className="text-gray-600 text-sm">Everything you need to know about our organic haircare</p>
+        <p className="text-gray-600 dark:text-[#c8dece] text-sm">Everything you need to know about our organic haircare</p>
       </div>
 
       {/* FAQ Items */}
@@ -72,7 +72,7 @@ export default function FAQs() {
         {faqs.map((faq, index) => (
           <div 
             key={faq.id} 
-            className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-[#8B9D83]/30 transition-all"
+            className="bg-white dark:bg-[#1e3d2a] rounded-2xl border border-gray-200 dark:border-[#2d5a3d] overflow-hidden hover:border-[#8B9D83]/30 dark:hover:border-[#4a7c59] transition-all"
           >
             <button
               className="w-full flex justify-between items-center text-left p-5 focus:outline-none group"
@@ -82,11 +82,11 @@ export default function FAQs() {
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#8B9D83]/10 flex items-center justify-center text-[#8B9D83] text-sm font-semibold mt-0.5">
                   {index + 1}
                 </span>
-                <span className="font-medium text-gray-800 text-base group-hover:text-[#8B9D83] transition-colors pr-4">
+                <span className="font-medium text-gray-800 dark:text-[#f0f7f2] text-base group-hover:text-[#8B9D83] dark:group-hover:text-[#7a9e85] transition-colors pr-4">
                   {faq.question}
                 </span>
               </div>
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-stone-50 flex items-center justify-center group-hover:bg-[#8B9D83]/10 transition-colors">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-stone-50 dark:bg-[#162d20] flex items-center justify-center group-hover:bg-[#8B9D83]/10 dark:group-hover:bg-[#2d5a3d] transition-colors">
                 {openId === faq.id ? (
                   <FaChevronUp className="text-[#8B9D83] text-sm" />
                 ) : (
@@ -100,8 +100,8 @@ export default function FAQs() {
               }`}
             >
               <div className="px-5 pb-5 pl-14">
-                <div className="w-full h-px bg-gradient-to-r from-gray-200 to-transparent mb-4"></div>
-                <p className="text-gray-600 leading-relaxed">
+                <div className="w-full h-px bg-gradient-to-r from-gray-200 dark:from-[#2d5a3d] to-transparent mb-4"></div>
+                <p className="text-gray-600 dark:text-[#c8dece] leading-relaxed">
                   {faq.answer}
                 </p>
               </div>
@@ -113,14 +113,14 @@ export default function FAQs() {
       {/* Footer CTA */}
       <div className="mt-8 p-6 bg-[#8B9D83]/5 rounded-2xl border border-[#8B9D83]/20">
         <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-white dark:bg-[#162d20] flex items-center justify-center flex-shrink-0">
             <svg className="w-5 h-5 text-[#8B9D83]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <div>
-            <h3 className="font-semibold text-gray-800 mb-1">Still have questions?</h3>
-            <p className="text-gray-600 text-sm mb-3">
+            <h3 className="font-semibold text-gray-800 dark:text-[#f0f7f2] mb-1">Still have questions?</h3>
+            <p className="text-gray-600 dark:text-[#c8dece] text-sm mb-3">
               Can't find the answer you're looking for? Our friendly customer service team is here to help.
             </p>
             <a 

@@ -4,7 +4,7 @@ export default function EditAddress() {
   return (
     <>
          <form action="#" className="flex flex-col w-full">
-          <h2 className="text-xl font-medium my-5">Shipping details</h2>
+          <h2 className="text-xl font-medium my-5 dark:text-[#f0f7f2]">Shipping details</h2>
 
           <InputField
             label="First name"

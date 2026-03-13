@@ -25,7 +25,7 @@ export default function AccountDetails() {
             placeholder="maggiejohn"
             required
           />
-          <p className="text-sm italic">This will be how your name will be displayed in the account section and in reviews</p>
+          <p className="text-sm italic dark:text-[#7a9e85]">This will be how your name will be displayed in the account section and in reviews</p>
             <InputField
                 label="Email address"
                 name="email"
@@ -34,7 +34,7 @@ export default function AccountDetails() {
                 required
             />
 
-            <h2 className="text-xl font-medium">Password change</h2>
+            <h2 className="text-xl font-medium dark:text-[#f0f7f2]">Password change</h2>
             <InputField
                 label="Current password (leave blank to leave unchanged)"
                 name="currentPassword"

@@ -1,12 +1,46 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  font-family: "Poppins", sans-serif; 
+  font-family: "Poppins", sans-serif;
   line-height: 1.5;
   font-weight: 400;
   background-color: white;
-  color: black;
+  color: #1a1a1a;
+
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-card: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+}
+
+.dark {
+  background-color: #0f1f17;
+  color: #f0f7f2;
+
+  --bg-primary: #0f1f17;
+  --bg-secondary: #162d20;
+  --bg-card: #1e3d2a;
+  --text-primary: #f0f7f2;
+  --text-secondary: #c8dece;
+  --text-muted: #7a9e85;
+  --border: #2d5a3d;
+}
+
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
 }
 .title {
   font-family: "Playfair Display", serif;
@@ -14,3 +48,23 @@
   font-weight: 400;
   font-style: normal;
 }
+
+.font-serif {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+
+.animate-fadeIn  { animation: fadeIn  0.2s ease-out forwards; }
+.animate-scaleIn { animation: scaleIn 0.2s ease-out forwards; }

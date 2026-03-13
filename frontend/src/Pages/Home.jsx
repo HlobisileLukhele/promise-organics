@@ -1,43 +1,29 @@
 import { IoMdArrowForward } from "react-icons/io";
+import ReviewsDisplay from "@/components/sections/ReviewsDisplay";
 import { FaLeaf } from "react-icons/fa";
 import Products from "@/components/layout/Products";
 import ServiceCard from "@/components/common/ServiceCard";
 import { CiDeliveryTruck } from "react-icons/ci";
 import { LuShieldCheck, LuCreditCard, LuPhoneCall } from "react-icons/lu";
 import PromiseHairCare from '@/assets/Promise-hair-care.png';
-import Shampoo from '@/assets/shampoo.png';
-import HairOil from '@/assets/hair-oil.png';
-import HairButter from '@/assets/butter.png';
+import { useState, useEffect } from "react";
 
 const Home = () => {
-    const products = [
-        {
-            id: 1,
-            name: "Organic Shampoo",
-            category: "Hair Care",
-            price: "250",
-            image: Shampoo
-        },
-        {
-            id: 2,
-            name: "Organic Hair Butter",
-            category: "Hair Care",
-            price: "200",
-            image: HairButter
-        },
-        {
-            id: 3,
-            name: "Organic Hair Oil",
-            category: "Hair Care",
-            price: "180",
-            image: HairOil
-        },
-    ];
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        fetch("/api/products")
+            .then((r) => r.json())
+            .then(({ data }) => {
+                setProducts(data || []);
+            })
+            .catch(() => setProducts([]));
+    }, []);
 
     return (
         <>
             {/* Hero Section */}
-            <section className="relative min-h-screen flex items-center overflow-hidden bg-white">
+            <section className="relative min-h-screen flex items-center overflow-hidden bg-white dark:bg-[#0f1f17]">
                 {/* Decorative Background Elements - Light Brown Accents */}
                 <div className="absolute top-20 right-10 w-72 h-72 bg-[#c8a882]/8 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-20 left-10 w-96 h-96 bg-[#c8a882]/6 rounded-full blur-3xl"></div>
@@ -124,7 +110,7 @@ const Home = () => {
                         <div className="relative z-10 hidden lg:block">
                             <div className="relative">
                                 {/* Main Product Image Container */}
-                                <div className="relative bg-white rounded-[3rem] p-8 shadow-2xl border-4 border-[#c8a882]/20">
+                                <div className="relative bg-white dark:bg-[#1e3d2a] rounded-[3rem] p-8 shadow-2xl border-4 border-[#c8a882]/20 dark:border-[#2d5a3d]">
                                     {/* Decorative Circle */}
                                     <div className="absolute -top-6 -right-6 w-32 h-32 bg-[#c8a882] rounded-full opacity-15 blur-2xl"></div>
                                     <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-[#7d9b7a] rounded-full opacity-15 blur-2xl"></div>
@@ -137,7 +123,7 @@ const Home = () => {
                                     </div>
                                     
                                     {/* Floating Product Cards */}
-                                    <div className="absolute -left-8 top-1/4 bg-white rounded-2xl p-4 shadow-2xl border-2 border-[#c8a882]/30 transform -rotate-6 hover:rotate-0 transition-transform duration-300">
+                                    <div className="absolute -left-8 top-1/4 bg-white dark:bg-[#1e3d2a] rounded-2xl p-4 shadow-2xl border-2 border-[#c8a882]/30 dark:border-[#2d5a3d] transform -rotate-6 hover:rotate-0 transition-transform duration-300">
                                         <div className="flex items-center gap-3">
                                             <div className="w-14 h-14 rounded-full bg-[#c8a882]/20 flex items-center justify-center">
                                                 <span className="text-2xl">🥑</span>
@@ -149,7 +135,7 @@ const Home = () => {
                                         </div>
                                     </div>
                                     
-                                    <div className="absolute -right-8 bottom-1/3 bg-white rounded-2xl p-4 shadow-2xl border-2 border-[#7d9b7a]/30 transform rotate-6 hover:rotate-0 transition-transform duration-300">
+                                    <div className="absolute -right-8 bottom-1/3 bg-white dark:bg-[#1e3d2a] rounded-2xl p-4 shadow-2xl border-2 border-[#7d9b7a]/30 dark:border-[#2d5a3d] transform rotate-6 hover:rotate-0 transition-transform duration-300">
                                         <div className="flex items-center gap-3">
                                             <div className="w-14 h-14 rounded-full bg-[#7d9b7a]/20 flex items-center justify-center">
                                                 <span className="text-2xl">🌿</span>
@@ -168,7 +154,7 @@ const Home = () => {
             </section>
 
             {/* Products Section */}
-            <div id="products" className="py-20 bg-white relative overflow-hidden">
+            <div id="products" className="py-20 bg-white dark:bg-[#0f1f17] relative overflow-hidden">
                 {/* Background Decorations */}
                 <div className="absolute top-10 right-10 w-64 h-64 bg-[#c8a882]/5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-10 left-10 w-80 h-80 bg-[#7d9b7a]/5 rounded-full blur-3xl"></div>
@@ -180,14 +166,14 @@ const Home = () => {
             </div>
 
             {/* Services Section */}
-            <div className="bg-gradient-to-br from-[#f5f1e8] via-white to-[#faf8f5] py-20 border-y-2 border-[#c8a882]/10 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-[#f5f1e8] via-white to-[#faf8f5] dark:from-[#0f1f17] dark:via-[#162d20] dark:to-[#0f1f17] py-20 border-y-2 border-[#c8a882]/10 dark:border-[#2d5a3d]/30 relative overflow-hidden">
                 {/* Background Decorations */}
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#c8a882]/5 rounded-full blur-3xl"></div>
                 
                 <div className="w-11/12 max-w-7xl mx-auto">
                     {/* Section Title */}
                     <div className="text-center mb-16">
-                        <div className="inline-flex items-center gap-2 bg-white px-5 py-2.5 rounded-full border-2 border-[#c8a882]/40 shadow-sm mb-4">
+                        <div className="inline-flex items-center gap-2 bg-white dark:bg-[#1e3d2a] px-5 py-2.5 rounded-full border-2 border-[#c8a882]/40 dark:border-[#2d5a3d] shadow-sm mb-4">
                             <span className="text-sm font-bold text-[#3d4d3d]">WHY CHOOSE PROMISE ORGANICS </span>
                         </div>
                         <h2 className="text-4xl md:text-5xl font-black text-[#3d4d3d] mb-4">
@@ -223,16 +209,19 @@ const Home = () => {
             </div>
 
             {/* Top Selling Products */}
-            <div className="py-20 px-20 bg-white relative overflow-hidden">
+            <div className="py-20 px-20 bg-white dark:bg-[#0f1f17] relative overflow-hidden">
                 {/* Background Decorations */}
                 <div className="absolute top-20 left-10 w-72 h-72 bg-[#7d9b7a]/5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-10 right-10 w-64 h-64 bg-[#c8a882]/5 rounded-full blur-3xl"></div>
-                
+
                 <Products
-                    title="Best Sellers" 
-                    products={products} 
+                    title="Best Sellers"
+                    products={products}
                 />
             </div>
+
+            {/* Customer Reviews */}
+            <ReviewsDisplay />
         </>
     )
 }

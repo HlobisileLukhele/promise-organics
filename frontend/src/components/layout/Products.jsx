@@ -3,6 +3,7 @@ import { IoMdArrowForward, IoMdHeartEmpty } from "react-icons/io";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
+import fallbackImg from "@/assets/butter.png";
 
 const Products = ({
   title = "Featured Products",
@@ -10,12 +11,12 @@ const Products = ({
   products = [],
   shop = false,
 }) => {
-  const addToCart = useCartStore((state) => state.addItem);
+  const addToCart     = useCartStore((state) => state.addItem);
   const addToWishlist = useWishlistStore((state) => state.addItem);
 
   const gridClass = shop
-    ? "grid md:grid-cols-3 gap-6 my-8"
-    : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 my-8";
+    ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 my-8"
+    : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 my-8";
 
   return (
     <div className={`w-11/12 max-w-7xl mt-10 mx-auto ${shop && 'mt-0'}`}>
@@ -28,57 +29,85 @@ const Products = ({
       </div>
 
       <div className={gridClass}>
-        {products.map((product) => (
-          <div key={product.id} className="group relative overflow-hidden flex flex-col">
-            {/* Product Image */}
-            <div className="relative bg-gray-100 rounded-2xl p-8 md:p-10 flex items-center justify-center min-h-[380px] md:min-h-[420px] overflow-hidden transition-transform duration-500 hover:scale-[1.02]">
-              {product.onSale && (
-                <div className="absolute top-5 left-5 bg-[#4a5fa8] text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wide z-10 shadow-lg">
-                  Sale
-                </div>
-              )}
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-full max-h-[320px] md:max-h-[360px] object-contain transform group-hover:scale-105 transition-transform duration-700 drop-shadow-2xl"
-              />
-              {/* Quick view eye button */}
-              <ProductDetail product={product} />
-            </div>
-
-            {/* Product Details */}
-            <div className="pt-5 pb-2 flex-1">
-              <h2 className="text-base md:text-lg font-semibold text-[#3d4f3e] mb-2 leading-snug min-h-[3rem] line-clamp-2">
-                {product.name}
-              </h2>
-
-              <div className="flex items-center gap-2 flex-wrap mb-4">
-                {product.originalPrice && (
-                  <span className="text-sm text-gray-400 line-through">{product.originalPrice}</span>
+        {products.map((product) => {
+          const image      = product.image || product.image_url || fallbackImg;
+          const outOfStock = product.in_stock === false;
+          return (
+            <div
+              key={product.id}
+              className={`group bg-white dark:bg-[#162d20] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300${outOfStock ? ' opacity-70' : ''}`}
+            >
+              {/* Image container */}
+              <div className="w-full aspect-square overflow-hidden bg-[#f7faf8] dark:bg-[#1e3d2a] flex items-center justify-center rounded-t-xl relative">
+                {product.onSale && (
+                  <div className="absolute top-3 left-3 z-10 bg-[#4a5fa8] text-white text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide">
+                    Sale
+                  </div>
                 )}
-                <h2 className="text-lg md:text-xl font-bold text-[#3d4f3e]">R{product.price}</h2>
+                {outOfStock && (
+                  <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-medium px-2.5 py-1 rounded-full">
+                    Out of Stock
+                  </div>
+                )}
+                <img
+                  src={image}
+                  alt={product.name}
+                  className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+                  onError={(e) => { e.target.src = fallbackImg; }}
+                />
+                <ProductDetail product={product} />
+              </div>
+
+              {/* Card body */}
+              <div className="p-4">
+                <h3 className="font-semibold text-sm md:text-base text-gray-800 dark:text-[#f0f7f2] mb-1 leading-snug min-h-[40px] line-clamp-2">
+                  {product.name}
+                </h3>
+
+                <div className="flex items-center gap-2 flex-wrap mb-3">
+                  {product.originalPrice && (
+                    <span className="text-xs text-gray-400 dark:text-[#7a9e85] line-through">{product.originalPrice}</span>
+                  )}
+                  <p className="text-[#4a7c59] dark:text-[#7a9e85] font-bold text-base">R{product.price}</p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => addToCart({
+                      id:       product.id,
+                      name:     product.name,
+                      image,
+                      price:    parseFloat(product.price),
+                      quantity: 1,
+                    })}
+                    disabled={outOfStock}
+                    className={`flex-1 flex items-center justify-center gap-1.5 text-xs font-medium py-2 px-3 rounded-lg transition-colors ${
+                      outOfStock
+                        ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed'
+                        : 'bg-[#4a7c59] hover:bg-[#2d5a3d] text-white'
+                    }`}
+                  >
+                    <HiOutlineShoppingBag size={14} className="shrink-0" />
+                    {outOfStock ? 'N/A' : 'CART'}
+                  </button>
+                  <button
+                    onClick={() => addToWishlist({
+                      id:    product.id,
+                      name:  product.name,
+                      image,
+                      price: product.price,
+                    })}
+                    className="flex-1 flex items-center justify-center gap-1.5 border border-gray-200 dark:border-[#2d5a3d] text-gray-600 dark:text-[#c8dece] hover:border-[#4a7c59] hover:text-[#4a7c59] text-xs font-medium py-2 px-3 rounded-lg transition-colors"
+                  >
+                    <IoMdHeartEmpty size={14} className="shrink-0" />
+                    SAVE
+                  </button>
+                </div>
               </div>
             </div>
-
-            {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-2 mt-auto">
-              <button
-                onClick={() => addToCart({ id: product.id, name: product.name, image: product.image, price: parseFloat(product.price), quantity: 1 })}
-                className="flex items-center justify-center gap-2 bg-[#7c8c7d] hover:bg-[#6b7a6c] text-white px-3 py-2.5 text-sm font-semibold uppercase tracking-wide transition-all duration-300"
-              >
-                <HiOutlineShoppingBag className="text-base shrink-0" />
-                <span>Add to Cart</span>
-              </button>
-              <button
-                onClick={() => addToWishlist({ id: product.id, name: product.name, image: product.image, price: product.price })}
-                className="flex items-center justify-center gap-2 border border-[#7c8c7d] text-[#7c8c7d] hover:bg-[#7c8c7d] hover:text-white px-3 py-2.5 text-sm font-semibold uppercase tracking-wide transition-all duration-300"
-              >
-                <IoMdHeartEmpty className="text-base shrink-0" />
-                <span>Wishlist</span>
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

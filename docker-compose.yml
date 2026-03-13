@@ -9,22 +9,45 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      # Allow any origin — nginx is the only public entry point so this is safe
+      - NODE_ENV=production
       - CLIENT_URL=*
-    restart: always
+    restart: unless-stopped
     networks:
       - ecommerce-network
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:5000/health || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   frontend:
     build:
       context: ./frontend
+      args:
+        - VITE_API_URL=http://backend:5000
     ports:
       - '80:80'
-    restart: always
+    restart: unless-stopped
     networks:
       - ecommerce-network
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+
+  admin:
+    build:
+      context: ./admin
+      args:
+        - VITE_API_URL=http://backend:5000
+    ports:
+      - '3001:80'
+    restart: unless-stopped
+    networks:
+      - ecommerce-network
+    depends_on:
+      backend:
+        condition: service_healthy
 
 networks:
   ecommerce-network:

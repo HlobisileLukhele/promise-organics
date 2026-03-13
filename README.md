@@ -1,155 +1,165 @@
-# 🛒 Promise Organics  Ecommerce Platform
+# Promise Organics — E-Commerce Platform
 
-A full-featured ecommerce platform built with modern web technologies, providing seamless shopping experiences for both guest and authenticated users.
+Full-stack e-commerce platform for Promise Organics, a natural hair and skincare brand.
 
-## 📋 Table of Contents
+## Stack
 
-- [Overview](#-overview)
-- [Features](#-features)
-- [User Types](#-user-types)
-- [Pages & Functionality](#-pages--functionality)
-- [Technology Stack](#-technology-stack)
-- [Getting Started](#-getting-started)
+| Layer | Tech |
+|---|---|
+| Frontend | React 19, Vite, Tailwind CSS v4, Zustand |
+| Admin | React 19, Vite, Tailwind CSS v4 |
+| Backend | Node.js, Express v5, Supabase (PostgreSQL) |
+| Auth | JWT + bcryptjs |
+| Payments | PayFast |
+| Container | Docker, nginx |
 
-## 🎯 Overview
+---
 
-This ecommerce platform delivers a modern, responsive shopping experience with comprehensive product management, user authentication, order processing, and payment integration. The platform supports both guest shopping and full user account management with advanced features like wishlists, orders history, and address management.
+## Project Structure
 
-## ✨ Features
+```
+promise-organics-ecommerce/
+├── frontend/          # Customer-facing React SPA
+├── admin/             # Admin dashboard React SPA
+├── backend/           # Express REST API
+├── docker-compose.yml
+└── Makefile
+```
 
-### 🛍️ Core Shopping Features
-- **Product Catalog**: Browse products with advanced filtering, sorting, and search
-- **Product Details**: Comprehensive product pages with images, descriptions, reviews, and specifications
-- **Shopping Cart**: Persistent cart functionality with quantity management
-- **Wishlist**: Save favorite products for later (authenticated users)
-- **Checkout Process**: Streamlined checkout with multiple payment options
-- **Order Management**: Complete order tracking and history
+---
 
-### 👤 User Management
-- **Guest Shopping**: Full shopping experience without registration
-- **User Authentication**: Secure login/registration system
-- **Profile Management**: User dashboard with personal information
-- **Address Book**: Manage shipping addresses
-- **Order History**: Detailed order tracking and search capabilities
+## Quick Start
 
-### 🎨 User Experience
-- **Responsive Design**: Mobile-first approach with cross-device compatibility
-- **Real-time Updates**: Live cart updates and inventory status
-- **Search & Filters**: Advanced product discovery tools
-- **Reviews & Ratings**: Customer feedback system
-- **Notifications**: Email confirmations and order updates
+### With Docker (recommended)
 
-## 👥 User Types
+```bash
+# Copy and fill in backend env
+cp backend/.env.example backend/.env
 
-### 🕶️ Guest Users
-- Browse and search products
-- Add items to cart
-- Add items to wishlist
+# Build and start all services
+make build
+make up
 
-### 🔑 Authenticated Users
-All guest features plus:
-- Save items to wishlist
-- Manage multiple addresses
-- View complete order history
-- Quick search functionality
-- Profile and preference management
-- Faster checkout with saved information
+# Tail logs
+make logs
+```
 
-## 📄 Pages & Functionality
+Services:
+- Frontend → http://localhost:80
+- Admin panel → http://localhost:3001
+- Backend API → http://localhost:5000
 
-### 🏠 Public Pages (Guest + Authenticated)
+### Local Development
 
-#### **Home Page** (`/`)
-- Featured products and categories
-- Promotional banners and deals
+```bash
+# Install all dependencies
+make install
 
-#### **Product Catalog** (`/shop`)
-- Grid/list view toggle
-- Advanced filtering (price, category, tags, search)
-- Pagination with infinite scroll option
-- Quick view modal
+# Start backend (in one terminal)
+make dev-backend
 
-#### **Product Details** (`/products/:id`)
-- High-resolution image gallery
-- Detailed product information
-- Customer reviews and ratings
-- Add to cart/wishlist buttons
-- Stock availability status
+# Start frontend (in another terminal)
+make dev-frontend
 
-#### **Search Results** (`/search`)
-- Search query results
-- Advanced filter sidebar
-- Search suggestions and autocomplete
+# Start admin (in another terminal)
+make dev-admin
+```
 
-#### **Shopping Cart** (`/cart`)
-- Item list with quantity controls
-- Price calculations and discounts
-- Shipping cost estimation
-- Guest/login prompt
+---
 
-#### **Checkout** (`/checkout`)
-- Multi-step checkout process
-- Shipping address form
-- Payment method selection
-- Order summary and confirmation
-- Real-time validation
+## Environment Variables
 
-### 🔐 Authenticated User Pages
+Create `backend/.env`:
 
-#### **User Dashboard** (`/dashboard`)
-- Account overview
-- Quick access to orders, wishlist, addresses
-- Account details
-  
-#### **Profile Management** (`/profile`)
-- Personal information editing
-- Password change functionality
+```env
+PORT=5000
+NODE_ENV=development
+JWT_SECRET=your-secret-here
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_KEY=your-service-key
+EMAIL_USER=you@gmail.com
+EMAIL_PASS=your-app-password
+CONTACT_RECEIVER_EMAIL=sales@promiseorganics.co.za
+CLIENT_URL=http://localhost:5173
+PAYFAST_MERCHANT_ID=
+PAYFAST_MERCHANT_KEY=
+PAYFAST_PASSPHRASE=
+PAYFAST_SANDBOX=true
+```
 
-#### **Order Management** (`/orders`)
-- Complete order history table
-- Search and filter orders
+Create `frontend/.env.local`:
 
-#### **Order Details** (`/orders/:id`)
-- Detailed order information
-- Item breakdown with images
-- Shipping addresses
-- Payment method details
-- Tracking information
+```env
+VITE_API_URL=http://localhost:5000
+```
 
-#### **Wishlist** (`/wishlist`)
-- Saved products grid
-- Move to cart functionality
-- Remove from wishlist
+---
 
-#### **Address Book** (`/addresses`)
-- List all saved addresses
-- Edit existing addresses
-- Set default shipping
-- Address validation
+## Testing
 
-## 🛠️ Technology Stack
+### Backend (Jest + Supertest)
 
-### Frontend
-- **Framework**: React 19+
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand
-- **Forms**: React Hook Form + Yup validation
-- **HTTP Client**: Axios / React Query
+```bash
+cd backend
+npm test              # run all tests
+npm run test:verbose  # with full output
+npm run test:coverage # with coverage report
+```
 
-### Backend
-- **Runtime**: Node.js / Laravel API
-- **Database**: MySQL
-- **Authentication**: JWT / Laravel Sanctum
-- **Payment Processing**: Payfast
+### Frontend (Vitest + Testing Library)
 
-### DevOps & Tools
-- **Version Control**: Git / GitHub
-- **Deployment**: Vercel / Docker
+```bash
+cd frontend
+npm run test:run      # run all tests once
+npm run test          # watch mode
+npm run test:coverage # with coverage report
+```
 
-## 🚀 Getting Started
+### Run all tests
 
-### Prerequisites
-- Node.js (v18 or higher)
-- Laravel (v12+)
-- npm/yarn package manager
-- MySQL database
+```bash
+make test-all
+```
+
+---
+
+## API Reference
+
+All protected endpoints require `Authorization: Bearer <token>`.
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/health` | — | Server health check |
+| GET | `/api/health` | — | DB health check |
+| POST | `/api/auth/register` | — | Register user |
+| POST | `/api/auth/login` | — | Login |
+| GET | `/api/auth/me` | ✓ | Current user |
+| GET | `/api/products` | — | All products |
+| GET | `/api/products/:id` | — | Single product |
+| GET | `/api/cart` | ✓ | Get cart |
+| POST | `/api/cart` | ✓ | Add to cart |
+| PATCH | `/api/cart/:id` | ✓ | Update quantity |
+| DELETE | `/api/cart/:id` | ✓ | Remove item |
+| GET | `/api/wishlist` | ✓ | Get wishlist |
+| POST | `/api/wishlist` | ✓ | Add to wishlist |
+| DELETE | `/api/wishlist/:id` | ✓ | Remove item |
+| GET | `/api/orders` | ✓ | User orders |
+| POST | `/api/orders` | ✓ | Create order from cart |
+| GET | `/api/orders/:id` | ✓ | Order details |
+| GET | `/api/reviews` | — | Approved reviews |
+| POST | `/api/reviews` | — | Submit review |
+| POST | `/api/contact` | — | Send enquiry |
+
+---
+
+## Docker Commands
+
+```bash
+make up        # start services (detached)
+make down      # stop services
+make build     # rebuild images
+make restart   # rebuild + restart
+make logs      # tail all logs
+make ps        # show running containers
+make clean     # stop + remove volumes + images
+```

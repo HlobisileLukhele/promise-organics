@@ -82,7 +82,7 @@ const Footer = () => {
                   <div className="w-8 h-8 rounded-full bg-[#C9B8A8]/20 border border-[#C9B8A8]/30 flex items-center justify-center mr-3 group-hover:bg-[#C9B8A8] group-hover:border-[#C9B8A8] transition-colors">
                     <BsEnvelopeAt className="w-4 h-4 group-hover:text-white transition-colors" />
                   </div>
-                  <span className="group-hover:text-[#C9B8A8] duration-200">info@promiseorganics.co.za</span>
+                  <span className="group-hover:text-[#C9B8A8] duration-200">sales@promiseorganics.co.za</span>
                 </a>
                 
                 <a 

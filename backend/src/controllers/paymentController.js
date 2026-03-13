@@ -1,6 +1,5 @@
-import { supabase }                              from '../config/supabase.js';
-import { config }                               from '../config/env.js';
-import { buildSignature, verifySignature, getPayfastUrl } from '../services/payfastService.js';
+import { supabase }                                                    from '../config/supabase.js';
+import { buildPayfastPayload, getPayfastUrl, verifyWebhookSignature } from '../services/payfastService.js';
 
 // POST /api/payment/initiate  (protected)
 export const initiatePayment = async (req, res, next) => {
@@ -24,56 +23,36 @@ export const initiatePayment = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Order not found.' });
     }
 
-    if (order.status !== 'pending') {
-      return res.status(400).json({
-        success: false,
-        message: `Order cannot be paid — current status is "${order.status}".`,
-      });
+    if (order.status === 'paid') {
+      return res.status(400).json({ success: false, message: 'Order already paid.' });
     }
 
-    // 2. Fetch user full_name from users table
-    const { data: user } = await supabase
-      .from('users')
-      .select('full_name')
-      .eq('id', userId)
-      .single();
-
-    const nameParts = (user?.full_name ?? '').trim().split(/\s+/);
-    const nameFirst = nameParts[0] || 'Customer';
-    const nameLast  = nameParts.slice(1).join(' ') || undefined; // omit if empty
-
-    // 3. Fetch billing info (optional — used for reference; PayFast doesn't require it in payload)
-    const { data: billing } = await supabase
+    // 2. Fetch billing info (optional)
+    const { data: billingInfo } = await supabase
       .from('billing_info')
       .select('address, city, province, postal_code, phone')
       .eq('user_id', userId)
       .single();
 
-    // 4. Build PayFast payload (field order matters for signature)
-    const payload = {
-      merchant_id:   config.payfast.merchantId,
-      merchant_key:  config.payfast.merchantKey,
-      return_url:    `${config.clientUrl}/payment/success`,
-      cancel_url:    `${config.clientUrl}/payment/cancel`,
-      notify_url:    `${config.backendUrl}/api/payment/webhook`,
-      name_first:    nameFirst,
-      ...(nameLast && { name_last: nameLast }),
-      email_address: req.user.email,
-      m_payment_id:  order.id,
-      amount:        Number(order.total_amount).toFixed(2),
-      item_name:     `Promise Organics Order`,
+    // 3. Fetch user name
+    const { data: user } = await supabase
+      .from('users')
+      .select('full_name, email')
+      .eq('id', userId)
+      .single();
+
+    const fullUser = {
+      full_name: user?.full_name ?? '',
+      email:     req.user.email,
     };
 
-    // 5. Generate MD5 signature and attach
-    const signature = buildSignature(payload, config.payfast.passphrase);
+    // 4. Build PayFast payload with signature
+    const payload = buildPayfastPayload(order, billingInfo ?? null, fullUser);
 
     res.json({
-      success: true,
-      data: {
-        payload:      { ...payload, signature },
-        payfast_url:  getPayfastUrl(),
-        billing_info: billing ?? null,
-      },
+      success:     true,
+      payfastUrl:  getPayfastUrl(),
+      payload,
     });
   } catch (err) {
     next(err);
@@ -83,49 +62,58 @@ export const initiatePayment = async (req, res, next) => {
 // POST /api/payment/webhook  (public — PayFast ITN)
 export const handleWebhook = async (req, res, next) => {
   try {
-    const { signature, ...params } = req.body;
+    const data = req.body;
 
     // 1. Verify MD5 signature
-    if (!signature) {
-      return res.status(400).send('Missing signature.');
-    }
-
-    let valid;
-    try {
-      valid = verifySignature(params, signature, config.payfast.passphrase);
-    } catch {
-      valid = false;
-    }
-
+    const valid = verifyWebhookSignature(data, process.env.PAYFAST_PASSPHRASE || '');
     if (!valid) {
       return res.status(400).send('Invalid signature.');
     }
 
-    const { payment_status, m_payment_id, pf_payment_id } = params;
+    const { payment_status, m_payment_id: orderId, pf_payment_id, amount_gross } = data;
 
-    // 2. Handle COMPLETE payment
+    // 2. Handle COMPLETE
     if (payment_status === 'COMPLETE') {
       const { error: orderError } = await supabase
         .from('orders')
         .update({ status: 'paid' })
-        .eq('id', m_payment_id);
+        .eq('id', orderId);
 
       if (orderError) throw orderError;
 
       const { error: paymentError } = await supabase
         .from('payments')
-        .insert({
-          order_id:           m_payment_id,
+        .upsert({
+          order_id:           orderId,
           payfast_payment_id: pf_payment_id ?? null,
           status:             'complete',
-        });
+          amount:             amount_gross ?? null,
+          updated_at:         new Date().toISOString(),
+        }, { onConflict: 'order_id' });
 
       if (paymentError) throw paymentError;
     }
 
-    // PayFast expects a 200 response — no body required
+    // 3. Handle FAILED or CANCELLED
+    if (payment_status === 'FAILED' || payment_status === 'CANCELLED') {
+      const paymentRecordStatus = payment_status === 'FAILED' ? 'failed' : 'cancelled';
+
+      await supabase.from('orders').update({ status: 'cancelled' }).eq('id', orderId);
+
+      await supabase.from('payments').upsert({
+        order_id:           orderId,
+        payfast_payment_id: pf_payment_id ?? null,
+        status:             paymentRecordStatus,
+        amount:             amount_gross ?? null,
+        updated_at:         new Date().toISOString(),
+      }, { onConflict: 'order_id' });
+    }
+
+    // Always return 200 to PayFast to prevent retries
     res.sendStatus(200);
   } catch (err) {
-    next(err);
+    // Still return 200 to prevent PayFast from retrying on server errors
+    console.error('Webhook error:', err.message);
+    res.sendStatus(200);
   }
 };

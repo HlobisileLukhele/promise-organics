@@ -1,49 +1,85 @@
-import crypto from 'crypto';
-import { config } from '../config/env.js';
+import md5 from 'md5';
 
 const SANDBOX_URL = 'https://sandbox.payfast.co.za/eng/process';
 const LIVE_URL    = 'https://www.payfast.co.za/eng/process';
 
-export function getPayfastUrl() {
-  return config.payfast.sandbox ? SANDBOX_URL : LIVE_URL;
-}
-
-// Mirrors PHP urlencode(): encodes spaces as '+', other special chars as %XX.
-function pfEncode(value) {
-  return encodeURIComponent(String(value)).replace(/%20/g, '+');
-}
-
 /**
- * Build an MD5 signature from an ordered params object.
- * Empty-string / null / undefined values are skipped (consistent with PayFast PHP SDK).
- * @param {Record<string, string>} params  - payload fields (no `signature` key)
- * @param {string} [passphrase]            - account passphrase (appended last if set)
- * @returns {string} hex MD5 digest
+ * Build an MD5 signature from a payment data object.
+ * Keys are sorted alphabetically. Empty / null / undefined values are skipped.
+ * @param {Record<string, string>} data
+ * @param {string} [passPhrase]
+ * @returns {string} uppercase MD5 hex digest
  */
-export function buildSignature(params, passphrase = '') {
-  const parts = Object.entries(params)
-    .filter(([, v]) => v !== '' && v !== null && v !== undefined)
-    .map(([k, v]) => `${k}=${pfEncode(v)}`);
+export function generateSignature(data, passPhrase = '') {
+  const queryString = Object.keys(data)
+    .sort()
+    .filter((key) => data[key] !== '' && data[key] !== null && data[key] !== undefined)
+    .map((key) => `${key}=${encodeURIComponent(String(data[key])).replace(/%20/g, '+')}`)
+    .join('&');
 
-  let str = parts.join('&');
-  if (passphrase) {
-    str += `&passphrase=${pfEncode(passphrase)}`;
-  }
+  const str = passPhrase
+    ? `${queryString}&passphrase=${encodeURIComponent(passPhrase).replace(/%20/g, '+')}`
+    : queryString;
 
-  return crypto.createHash('md5').update(str).digest('hex');
+  return md5(str).toUpperCase();
 }
 
 /**
- * Verify a signature received in a PayFast ITN callback.
- * @param {Record<string, string>} params           - all ITN fields except `signature`
- * @param {string}                 receivedSignature - the `signature` field from PayFast
- * @param {string}                 [passphrase]
+ * Build the complete PayFast payment payload for an order.
+ * @param {{ id: string, total_amount: number }} order
+ * @param {object|null} billingInfo  - user's billing record (reserved, not sent to PayFast)
+ * @param {{ full_name: string, email: string }} user
+ * @returns {Record<string, string>} payload including signature
+ */
+export function buildPayfastPayload(order, billingInfo, user) {
+  const nameParts = (user.full_name ?? '').trim().split(/\s+/);
+  const nameFirst = nameParts[0] || 'Customer';
+  const nameLast  = nameParts.slice(1).join(' ') || '';
+
+  const payload = {
+    merchant_id:   process.env.PAYFAST_MERCHANT_ID,
+    merchant_key:  process.env.PAYFAST_MERCHANT_KEY,
+    return_url:    `${process.env.CLIENT_URL}/payment/success`,
+    cancel_url:    `${process.env.CLIENT_URL}/payment/cancelled`,
+    notify_url:    `${process.env.BACKEND_URL}/api/payment/webhook`,
+    name_first:    nameFirst,
+    name_last:     nameLast,
+    email_address: user.email,
+    m_payment_id:  order.id,
+    amount:        Number(order.total_amount).toFixed(2),
+    item_name:     `Promise Organics Order #${order.id.slice(0, 8)}`,
+  };
+
+  // Strip empty/null/undefined fields so PayFast doesn't reject the payload
+  Object.keys(payload).forEach((key) => {
+    if (payload[key] === '' || payload[key] === undefined || payload[key] === null) {
+      delete payload[key];
+    }
+  });
+
+  const signature = generateSignature(payload, process.env.PAYFAST_PASSPHRASE || '');
+
+  return { ...payload, signature };
+}
+
+/**
+ * Returns the correct PayFast payment page URL based on PAYFAST_SANDBOX env var.
+ * @returns {string}
+ */
+export function getPayfastUrl() {
+  return process.env.PAYFAST_SANDBOX === 'true' ? SANDBOX_URL : LIVE_URL;
+}
+
+/**
+ * Verify a PayFast ITN webhook signature.
+ * Removes the 'signature' field from data, recomputes, and compares.
+ * @param {Record<string, string>} data  - all ITN fields including 'signature'
+ * @param {string} [passPhrase]
  * @returns {boolean}
  */
-export function verifySignature(params, receivedSignature, passphrase = '') {
-  const computed = buildSignature(params, passphrase);
-  return crypto.timingSafeEqual(
-    Buffer.from(computed),
-    Buffer.from(receivedSignature),
-  );
+export function verifyWebhookSignature(data, passPhrase = '') {
+  const { signature, ...params } = data;
+  if (!signature) return false;
+  const computed = generateSignature(params, passPhrase);
+  return computed.toLowerCase() === signature.toLowerCase();
 }

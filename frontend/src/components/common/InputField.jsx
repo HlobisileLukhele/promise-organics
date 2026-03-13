@@ -22,7 +22,7 @@ const InputField = ({
         placeholder={placeholder}
         onChange={onChange}
         required={required}
-        className="px-4 py-2 border border-gray-300  outline-none focus-within:border-gray-500 rounded-xs"
+        className="px-4 py-2 border border-gray-300 dark:border-[#2d5a3d] dark:bg-[#162d20] dark:text-[#f0f7f2] dark:placeholder-[#7a9e85] outline-none focus-within:border-gray-500 dark:focus-within:border-[#7a9e85] rounded-xs"
       />
     </div>
   );
