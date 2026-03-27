@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { apiFetch } from '@/utils/api';
 import { IoChatbubbleEllipses, IoClose, IoSend } from 'react-icons/io5';
 import { IoLogoWhatsapp } from 'react-icons/io5';
 
@@ -55,7 +56,7 @@ export default function ChatWidget() {
     setShowQuickQuestions(false);
 
     try {
-      const res  = await fetch(`${API}/api/chat`, {
+      const res  = await apiFetch(`${API}/api/chat`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
@@ -101,7 +102,7 @@ export default function ChatWidget() {
     setIsLoading(true);
 
     try {
-      const res  = await fetch(`${API}/api/chat`, {
+      const res  = await apiFetch(`${API}/api/chat`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({

@@ -1,3 +1,4 @@
+// Centralised environment configuration — all process.env access goes through this module.
 import dotenv from 'dotenv';
 dotenv.config();
 

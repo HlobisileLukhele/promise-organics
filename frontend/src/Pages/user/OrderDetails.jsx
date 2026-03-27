@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FaArrowLeft } from 'react-icons/fa';
 import { Link, useParams } from 'react-router-dom';
 import { useUserStore } from '@/store/userStore';
+import { calculateShipping } from '@/utils/shipping';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -62,8 +63,8 @@ export default function OrderDetails() {
     );
   }
 
-  const shipping = 99;
-  const subtotal = Number(order.total_amount) - shipping;
+  const subtotal = (order.order_items || []).reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const shipping = calculateShipping(subtotal);
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -122,7 +123,10 @@ export default function OrderDetails() {
           </div>
           <div className="flex justify-between">
             <span>Shipping</span>
-            <span>R{shipping.toFixed(2)}</span>
+            {shipping === 0
+              ? <span className="text-[#4a7c59] dark:text-[#a8d4b5] font-semibold">FREE</span>
+              : <span>R{shipping.toFixed(2)}</span>
+            }
           </div>
           <div className="flex justify-between font-semibold text-gray-900 border-t border-gray-200 pt-3 text-base dark:text-[#f0f7f2] dark:border-[#2d5a3d]">
             <span>Total</span>

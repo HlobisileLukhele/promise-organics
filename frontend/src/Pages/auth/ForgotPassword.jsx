@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { apiFetch } from '@/utils/api'
 import { Link } from 'react-router-dom'
 import promiseLogo from '@/assets/promise-logo.png'
 
@@ -16,7 +17,7 @@ const ForgotPassword = () => {
     setErrorMessage('')
 
     try {
-      const res = await fetch(`${API}/api/auth/forgot-password`, {
+      const res = await apiFetch(`${API}/api/auth/forgot-password`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ email: email.trim() }),

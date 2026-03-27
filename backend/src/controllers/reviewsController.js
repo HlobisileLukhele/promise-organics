@@ -1,3 +1,4 @@
+// Reviews controllers — submit, list approved reviews, and mark reviews as helpful.
 import { supabase } from '../config/supabase.js';
 
 // POST /api/reviews

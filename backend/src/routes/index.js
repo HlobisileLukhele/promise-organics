@@ -1,4 +1,6 @@
+// Route aggregator — mounts all sub-routers under /api.
 import { Router } from 'express';
+import { getCsrfToken } from '../middleware/csrf.js';
 import authRoutes    from './auth.js';
 import productRoutes from './products.js';
 import cartRoutes    from './cart.js';
@@ -14,6 +16,9 @@ import adminRoutes   from './admin.js';
 import blogRoutes    from './blog.js';
 
 const router = Router();
+
+// Public — no auth required; must be reachable before any session exists.
+router.get('/csrf-token', getCsrfToken);
 
 router.use('/auth',     authRoutes);
 router.use('/products', productRoutes);

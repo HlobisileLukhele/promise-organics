@@ -1,8 +1,7 @@
+// Admin auth middleware — verifies the JWT and confirms the user has role = 'admin' in the database.
 import jwt from 'jsonwebtoken';
 import { config } from '../config/env.js';
 import { supabase } from '../config/supabase.js';
-
-// Verifies JWT and checks that the user has role = 'admin'
 export const adminAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 

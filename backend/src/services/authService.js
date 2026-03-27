@@ -1,3 +1,6 @@
+// Auth service — JWT sign/verify helpers.
+// TODO: authController.js defines its own inline signToken and does not import this module.
+//       Either wire up this service or remove it to avoid dead code.
 import jwt from 'jsonwebtoken';
 import { config } from '../config/env.js';
 

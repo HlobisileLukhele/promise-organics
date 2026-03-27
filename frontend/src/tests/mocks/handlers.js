@@ -123,4 +123,9 @@ export const handlers = [
       status: 'ok', db: 'connected', userCount: 1
     })
   }),
+
+  // CSRF token — public; returns a predictable masked token for tests
+  http.get(`${BASE_URL}/api/csrf-token`, () => {
+    return HttpResponse.json({ success: true, csrfToken: 'test-csrf-token-masked' })
+  }),
 ]

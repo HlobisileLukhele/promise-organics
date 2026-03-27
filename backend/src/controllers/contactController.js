@@ -1,8 +1,11 @@
+// Contact controller — sends a contact form enquiry to the business and an auto-reply to the customer.
 import nodemailer from 'nodemailer';
 
+// Build the transporter once at module load — reused for every request.
+// Credentials are read from environment variables (never hardcoded).
 const transporter = nodemailer.createTransport({
-  host: 'smtp.zoho.com',
-  port: 465,
+  host:   'smtp.zoho.com',
+  port:   465,
   secure: true,
   auth: {
     user: process.env.EMAIL_USER,
@@ -10,13 +13,15 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-transporter.verify((error) => {
-  if (error) {
-    console.error('Email transporter error:', error.message);
-  } else {
-    console.log('Email server ready ✅');
-  }
-});
+// verify() is a real-nodemailer method; defensive check ensures the
+// transport mock in tests (which omits verify) does not crash the module.
+if (typeof transporter.verify === 'function') {
+  transporter.verify((error) => {
+    if (error) {
+      console.error('Email transporter error:', error.message);
+    }
+  });
+}
 
 // POST /api/contact
 export const sendContactEnquiry = async (req, res) => {
@@ -60,12 +65,12 @@ export const sendContactEnquiry = async (req, res) => {
 
     res.json({ success: true, message: 'Enquiry sent successfully' });
   } catch (error) {
-    console.error('Email error details:', {
-      message:  error.message,
-      code:     error.code,
-      command:  error.command,
-      response: error.response,
+    console.error('Contact email error:', {
+      message: error.message,
+      code:    error.code,
+      command: error.command,
     });
-    res.status(500).json({ success: false, message: 'Failed to send enquiry', error: error.message });
+    // Never expose internal SMTP details to the client
+    res.status(500).json({ success: false, message: 'Failed to send enquiry. Please try again later.' });
   }
 };

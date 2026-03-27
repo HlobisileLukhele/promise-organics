@@ -5,6 +5,7 @@ import ChatWidget from '@/components/common/ChatWidget';
 import { useCartStore } from '@/store/cartStore';
 import { useUserStore } from '@/store/userStore';
 import useThemeStore from '@/store/themeStore';
+import { useCsrfStore } from '@/store/csrfStore';
 import Home from '@/Pages/Home';
 import About from '@/Pages/About';
 import Blog from '@/Pages/Blog';
@@ -26,14 +27,24 @@ import Orders from '@/Pages/user/Orders';
 import OrderDetails from '@/Pages/user/OrderDetails';
 import Address from '@/Pages/user/Address';
 import EditAddress from '@/Pages/user/EditAddress';
+import TermsAndConditions from '@/Pages/TermsAndConditions';
+import PrivacyPolicy from '@/Pages/PrivacyPolicy';
 
 export default function App() {
-  const token = useUserStore((s) => s.token)
-  const loadCart = useCartStore((s) => s.loadCart)
-  const initTheme = useThemeStore((s) => s.initTheme)
+  const token          = useUserStore((s) => s.token)
+  const loadCart       = useCartStore((s) => s.loadCart)
+  const initTheme      = useThemeStore((s) => s.initTheme)
+  const fetchCsrfToken = useCsrfStore((s) => s.fetchToken)
 
   useEffect(() => {
     initTheme()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch CSRF token once on app init. The backend sets an httpOnly cookie
+  // and returns a masked token we'll attach to every mutating request.
+  // After login the token is automatically rotated — see userStore.login().
+  useEffect(() => {
+    fetchCsrfToken()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -56,6 +67,8 @@ export default function App() {
           <Route path="checkout" element={<Checkout />} />
           <Route path="payment/success" element={<PaymentSuccess />} />
           <Route path="payment/cancelled" element={<PaymentCancelled />} />
+          <Route path="terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="privacy-policy" element={<PrivacyPolicy />} />
 
           {/* authenticated user navigation */}
           <Route path="account" element={<UserNavbar/>}>

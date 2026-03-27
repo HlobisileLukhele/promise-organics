@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { apiFetch } from '@/utils/api'
 import { Link, useNavigate } from 'react-router-dom'
 import promiseLogo from '@/assets/promise-logo.png'
+import { LuEye, LuEyeOff } from 'react-icons/lu'
 
 const API = import.meta.env.VITE_API_URL || ''
 
@@ -15,6 +17,8 @@ const ResetPassword = () => {
   const [success, setSuccess]             = useState(false)
   const [errorMessage, setErrorMessage]   = useState('')
   const [matchError, setMatchError]       = useState('')
+  const [showNew, setShowNew]             = useState(false)
+  const [showConfirm, setShowConfirm]     = useState(false)
 
   // Auto-redirect after success
   useEffect(() => {
@@ -39,7 +43,7 @@ const ResetPassword = () => {
 
     setLoading(true)
     try {
-      const res  = await fetch(`${API}/api/auth/reset-password`, {
+      const res  = await apiFetch(`${API}/api/auth/reset-password`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ token, newPassword }),
@@ -59,7 +63,7 @@ const ResetPassword = () => {
   }
 
   const inputClass =
-    'border border-gray-200 dark:border-[#2d5a3d] dark:bg-[#162d20] dark:text-[#f0f7f2] dark:placeholder-[#7a9e85] block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60'
+    'border border-gray-200 dark:border-[#2d5a3d] dark:bg-[#162d20] dark:text-[#f0f7f2] dark:placeholder-[#7a9e85] block rounded-md px-4 py-1.5 outline-none w-full focus:border-[#7c8c7d]/60 pr-10'
 
   // No token in URL
   if (!token) {
@@ -119,26 +123,48 @@ const ResetPassword = () => {
           <form onSubmit={handleSubmit}>
             {/* New Password */}
             <label className="font-semibold opacity-70 text-sm dark:text-[#c8dece]">New Password</label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Min. 8 characters"
-              required
-              className={inputClass}
-            />
+            <div className="relative my-2.5">
+              <input
+                type={showNew ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Min. 8 characters"
+                required
+                className={inputClass}
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setShowNew((v) => !v)}
+                aria-label={showNew ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-[#7a9e85] dark:hover:text-[#c8dece] transition-colors"
+              >
+                {showNew ? <LuEyeOff size={16} /> : <LuEye size={16} />}
+              </button>
+            </div>
             <p className="text-xs text-gray-400 dark:text-[#7a9e85] -mt-1 mb-3 ml-1">Minimum 8 characters</p>
 
             {/* Confirm Password */}
             <label className="font-semibold opacity-70 text-sm dark:text-[#c8dece]">Confirm Password</label>
-            <input
-              type="password"
-              value={confirm}
-              onChange={(e) => { setConfirm(e.target.value); setMatchError('') }}
-              placeholder="Repeat your password"
-              required
-              className={inputClass}
-            />
+            <div className="relative my-2.5">
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                value={confirm}
+                onChange={(e) => { setConfirm(e.target.value); setMatchError('') }}
+                placeholder="Repeat your password"
+                required
+                className={inputClass}
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setShowConfirm((v) => !v)}
+                aria-label={showConfirm ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-[#7a9e85] dark:hover:text-[#c8dece] transition-colors"
+              >
+                {showConfirm ? <LuEyeOff size={16} /> : <LuEye size={16} />}
+              </button>
+            </div>
             {matchError && (
               <p className="text-rose-500 text-xs mb-3 ml-1">{matchError}</p>
             )}

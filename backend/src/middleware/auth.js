@@ -1,8 +1,6 @@
+// Auth middleware — verifies the JWT Bearer token and attaches the decoded user to req.user.
 import jwt from 'jsonwebtoken';
 import { config } from '../config/env.js';
-
-// Verifies the JWT from the Authorization Bearer header
-// and attaches { id, email } to req.user
 export const requireAuth = (req, res, next) => {
   const authHeader = req.headers.authorization;
 

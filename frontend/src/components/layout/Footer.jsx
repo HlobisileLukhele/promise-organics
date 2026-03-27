@@ -47,10 +47,11 @@ const Footer = () => {
                 <span className="absolute bottom-0 left-0 w-12 h-0.5 bg-gradient-to-r from-[#C9B8A8] to-transparent -mb-2"></span>
               </h2>
               <nav className="flex flex-col space-y-2.5">
-                <Link to="#" className={linkClass}>Privacy Policy</Link>
-                <Link to="#" className={linkClass}>Returns Policy</Link>
-                <Link to="#" className={linkClass}>Terms & Conditions</Link>
-                <Link to="#" className={linkClass}>Contact Us</Link>
+                <Link to="/about" className={linkClass}>About Us</Link>
+                <Link to="/blog" className={linkClass}>Blog</Link>
+                <Link to="/privacy-policy" className={linkClass}>Privacy Policy</Link>
+                <Link to="/terms-and-conditions" className={linkClass}>Terms &amp; Conditions</Link>
+                <Link to="/contact" className={linkClass}>Contact Us</Link>
               </nav>
             </div>
 

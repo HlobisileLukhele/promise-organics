@@ -1,3 +1,5 @@
+// Blog controllers — public post listing/retrieval and admin post management.
+// TODO: 500 responses currently return raw `error.message` — replace with a generic message before going live.
 import { supabase } from '../config/supabase.js';
 
 // ── Public ──────────────────────────────────────────────────────────────────

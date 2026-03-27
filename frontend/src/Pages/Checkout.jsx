@@ -2,6 +2,16 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useUserStore } from '@/store/userStore'
 import { useCartStore } from '@/store/cartStore'
+import { apiFetch } from '@/utils/api'
+import { useJsApiLoader } from '@react-google-maps/api'
+import usePlacesAutocomplete, { getGeocode } from 'use-places-autocomplete'
+import { FREE_SHIPPING_THRESHOLD, calculateShipping } from '@/utils/shipping'
+
+// NOTE: Both "Places API" and "Places API (New)" must be enabled in Google Cloud Console
+// for use-places-autocomplete to work correctly.
+
+// Must be defined outside the component to prevent re-renders on every render cycle.
+const PLACES_LIBRARIES = ['places']
 
 const API = import.meta.env.VITE_API_URL || ''
 
@@ -28,6 +38,63 @@ export default function Checkout() {
     firstName: '', lastName: '', address: '',
     city: '', province: '', postalCode: '', phone: '',
   })
+
+  // ── Google Maps loader ───────────────────────────────────────────────────────
+  const { isLoaded: mapsLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_PLACES_API_KEY || '',
+    libraries: PLACES_LIBRARIES,
+  })
+
+  // ── use-places-autocomplete hook (only active once Maps script is loaded) ────
+  const {
+    ready,
+    value: addressInput,
+    suggestions: { status, data: suggestions },
+    setValue: setAddressInput,
+    clearSuggestions,
+  } = usePlacesAutocomplete({
+    requestOptions: { componentRestrictions: { country: 'za' } },
+    debounce: 300,
+    // Defer initialisation until the Maps script is loaded
+    initOnMount: mapsLoaded,
+  })
+
+  const handleAddressInput = (e) => {
+    setAddressInput(e.target.value)
+    setForm((f) => ({ ...f, address: e.target.value }))
+  }
+
+  const handleSuggestionSelect = async (description) => {
+    setAddressInput(description, false)
+    clearSuggestions()
+
+    try {
+      const results = await getGeocode({ address: description })
+      const components = results[0]?.address_components ?? []
+
+      const get = (types) =>
+        components.find((c) => types.some((t) => c.types.includes(t)))?.long_name ?? ''
+
+      const streetNumber = get(['street_number'])
+      const route        = get(['route'])
+      const address      = [streetNumber, route].filter(Boolean).join(' ') || description
+      const suburb       = get(['sublocality_level_1', 'sublocality', 'neighborhood'])
+      const city         = get(['locality']) || suburb
+      const postalCode   = get(['postal_code'])
+      const province     = get(['administrative_area_level_1'])
+
+      setForm((f) => ({
+        ...f,
+        address,
+        ...(city                                      && { city }),
+        ...(postalCode                                && { postalCode }),
+        ...(province && PROVINCES.includes(province) && { province }),
+      }))
+    } catch {
+      // Geocode failed — keep the typed text as-is
+      setForm((f) => ({ ...f, address: description }))
+    }
+  }
 
   // ── Fetch cart + billing from API on mount ──────────────────────────────────
   useEffect(() => {
@@ -67,9 +134,10 @@ export default function Checkout() {
   }, [token]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Derived totals ──────────────────────────────────────────────────────────
-  const subtotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0)
-  const shipping = subtotal === 0 ? 0 : 99
-  const total    = subtotal + shipping
+  const subtotal             = cartItems.reduce((s, i) => s + i.price * i.quantity, 0)
+  const shipping             = calculateShipping(subtotal)
+  const total                = subtotal + shipping
+  const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal)
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   const handleChange = (e) =>
@@ -87,7 +155,7 @@ export default function Checkout() {
 
     try {
       setSubmitting(true)
-      const res = await fetch(`${API}/api/billing`, {
+      const res = await apiFetch(`${API}/api/billing`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body:    JSON.stringify({
@@ -118,7 +186,7 @@ export default function Checkout() {
     try {
       setLoading(true)
       console.log('Step 1: Creating order...')
-      const orderRes = await fetch('http://localhost:5000/api/orders', {
+      const orderRes = await apiFetch('http://localhost:5000/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
         body: JSON.stringify({}),
@@ -134,7 +202,7 @@ export default function Checkout() {
       console.log('Step 3: Order ID:', orderId)
 
       console.log('Step 4: Initiating Payfast payment...')
-      const paymentRes = await fetch('http://localhost:5000/api/payment/initiate', {
+      const paymentRes = await apiFetch('http://localhost:5000/api/payment/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
         body: JSON.stringify({ order_id: orderId }),
@@ -149,18 +217,9 @@ export default function Checkout() {
 
       console.log('Step 6: Redirecting to Payfast...')
       const { payfastUrl, payload } = paymentData
-      const form = document.createElement('form')
-      form.method = 'POST'
-      form.action = payfastUrl
-      Object.keys(payload).forEach((key) => {
-        const input = document.createElement('input')
-        input.type = 'hidden'
-        input.name = key
-        input.value = payload[key]
-        form.appendChild(input)
-      })
-      document.body.appendChild(form)
-      form.submit()
+      if (payfastUrl) {
+        window.location.href = `${payfastUrl}?${new URLSearchParams(payload).toString()}`
+      }
     } catch (error) {
       console.error('Payment error:', error)
       alert('Something went wrong. Please try again.')
@@ -219,6 +278,20 @@ export default function Checkout() {
         ))}
       </div>
 
+      {/* Free shipping banner */}
+      {subtotal > 0 && (
+        <div className={`mb-6 px-4 py-3 text-sm font-medium rounded-sm border ${
+          amountToFreeShipping === 0
+            ? 'bg-[#e8f5ec] dark:bg-[#1a3d28] border-[#4a7c59] dark:border-[#4a7c59] text-[#2d5a3d] dark:text-[#a8d4b5]'
+            : 'bg-[#f5f0e8] dark:bg-[#2d2a1e] border-[#c4a96a] dark:border-[#8a7040] text-[#5a4a1e] dark:text-[#d4be8a]'
+        }`}>
+          {amountToFreeShipping === 0
+            ? '🎉 You qualify for FREE shipping!'
+            : `Add R${amountToFreeShipping.toFixed(2)} more to your order and get FREE shipping!`
+          }
+        </div>
+      )}
+
       {error && (
         <div className="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-sm">
           {error}
@@ -251,14 +324,32 @@ export default function Checkout() {
             </div>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Address <span className="text-red-500">*</span>
             </label>
             <input
-              name="address" value={form.address} onChange={handleChange}
-              placeholder="12 Jacaranda Street" required className={inputClass}
+              name="address"
+              value={ready ? addressInput : form.address}
+              onChange={ready ? handleAddressInput : handleChange}
+              placeholder="12 Jacaranda Street"
+              required
+              autoComplete="off"
+              className={inputClass}
             />
+            {status === 'OK' && suggestions.length > 0 && (
+              <ul className="absolute z-50 left-0 right-0 mt-1 bg-white dark:bg-[#162d20] border border-gray-200 dark:border-[#2d5a3d] rounded-sm shadow-lg max-h-52 overflow-y-auto text-sm">
+                {suggestions.map(({ place_id, description }) => (
+                  <li
+                    key={place_id}
+                    onMouseDown={() => handleSuggestionSelect(description)}
+                    className="px-4 py-2.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1e3d2a] text-gray-800 dark:text-[#c8dece]"
+                  >
+                    {description}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="flex gap-4 mb-4">
@@ -342,7 +433,12 @@ export default function Checkout() {
               </div>
               <div className="flex justify-between text-gray-600 dark:text-[#c8dece]">
                 <span>Shipping</span>
-                <span>R{shipping.toFixed(2)}</span>
+                <span>
+                  {shipping === 0
+                    ? <span className="text-[#4a7c59] dark:text-[#a8d4b5] font-semibold">FREE</span>
+                    : `R${shipping.toFixed(2)}`
+                  }
+                </span>
               </div>
               <div className="flex justify-between font-semibold text-gray-900 dark:text-[#f0f7f2] text-base pt-2 border-t border-gray-200 dark:border-[#2d5a3d]">
                 <span>Total</span>

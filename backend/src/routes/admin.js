@@ -1,3 +1,4 @@
+// Admin routes — all endpoints require admin auth; covers orders, products, reviews, stats, and email diagnostics.
 import { Router } from 'express';
 import { adminAuth } from '../middleware/adminAuth.js';
 import {

@@ -1,3 +1,4 @@
+// Product controllers — public read access for the product catalogue.
 import { supabase } from '../config/supabase.js';
 
 export const getAllProducts = async (req, res, next) => {

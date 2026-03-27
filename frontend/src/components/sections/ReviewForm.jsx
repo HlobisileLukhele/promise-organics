@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { apiFetch } from '@/utils/api';
 import { GoStarFill } from 'react-icons/go';
 import { FiStar } from 'react-icons/fi';
 
@@ -59,7 +60,7 @@ export default function ReviewForm() {
         }))
       );
 
-      const res = await fetch(`${API}/api/reviews`, {
+      const res = await apiFetch(`${API}/api/reviews`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({

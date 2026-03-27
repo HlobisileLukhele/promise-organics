@@ -3,6 +3,7 @@ import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import { Link, useNavigate } from "react-router-dom";
+import { FREE_SHIPPING_THRESHOLD, calculateShipping } from "@/utils/shipping";
 
 const Cart = () => {
   const { items, updateQuantity, removeItem } = useCartStore();
@@ -17,8 +18,9 @@ const Cart = () => {
 
   const calculateSubtotal = (item) => item.price * item.quantity;
   const totalSubtotal = items.reduce((sum, item) => sum + calculateSubtotal(item), 0);
-  const shipping   = totalSubtotal === 0 ? 0 : 99;
+  const shipping   = calculateShipping(totalSubtotal);
   const grandTotal = totalSubtotal + shipping;
+  const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - totalSubtotal);
 
   const handleCheckout = () => {
     const token = useUserStore.getState().token;
@@ -205,7 +207,21 @@ const Cart = () => {
 
         {/* Order summary — right column */}
         <div className="lg:col-span-1">
-          <div className="w-full bg-white dark:bg-[#1e3d2a] rounded-xl border border-gray-100 dark:border-[#2d5a3d] p-6 lg:mt-8">
+          {/* Free shipping banner */}
+          {totalSubtotal > 0 && (
+            <div className={`rounded-lg px-4 py-3 mb-4 text-sm font-medium border ${
+              amountToFreeShipping === 0
+                ? 'bg-[#e8f5ec] dark:bg-[#1a3d28] border-[#4a7c59] dark:border-[#4a7c59] text-[#2d5a3d] dark:text-[#a8d4b5]'
+                : 'bg-[#f5f0e8] dark:bg-[#2d2a1e] border-[#c4a96a] dark:border-[#8a7040] text-[#5a4a1e] dark:text-[#d4be8a]'
+            }`}>
+              {amountToFreeShipping === 0
+                ? '🎉 You qualify for FREE shipping!'
+                : `Add R${amountToFreeShipping.toFixed(2)} more to your order and get FREE shipping!`
+              }
+            </div>
+          )}
+
+          <div className="w-full bg-white dark:bg-[#1e3d2a] rounded-xl border border-gray-100 dark:border-[#2d5a3d] p-6 lg:mt-0">
             <h2 className="text-lg font-medium my-6 dark:text-[#f0f7f2]">Cart totals</h2>
 
             <div className="border-gray-100 dark:border-[#2d5a3d] border mb-10"></div>
@@ -217,7 +233,14 @@ const Cart = () => {
 
             <div className="flex justify-between mb-2 text-sm dark:text-[#c8dece]">
               <span>Shipping</span>
-              <span>{shipping === 0 ? "—" : `R${shipping.toFixed(2)}`}</span>
+              <span>
+                {totalSubtotal === 0
+                  ? "—"
+                  : shipping === 0
+                    ? <span className="text-[#4a7c59] dark:text-[#a8d4b5] font-semibold">FREE</span>
+                    : `R${shipping.toFixed(2)}`
+                }
+              </span>
             </div>
 
             <div className="border-t border-gray-300 dark:border-[#2d5a3d] my-4"></div>

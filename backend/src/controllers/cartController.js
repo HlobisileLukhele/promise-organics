@@ -1,3 +1,4 @@
+// Cart controllers — add, update, remove, and fetch cart items for the authenticated user.
 import { supabase } from '../config/supabase.js';
 
 // GET /api/cart

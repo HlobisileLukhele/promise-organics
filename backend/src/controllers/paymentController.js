@@ -1,3 +1,4 @@
+// Payment controllers — initiate a PayFast payment and handle the ITN webhook callback.
 import { supabase }                                                    from '../config/supabase.js';
 import { buildPayfastPayload, getPayfastUrl, verifyWebhookSignature } from '../services/payfastService.js';
 

@@ -2,10 +2,13 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useUserStore } from "@/store/userStore"
 import promiseLogo from "@/assets/promise-logo.png"
+import { LuEye, LuEyeOff } from 'react-icons/lu'
 
 const SignUp = () => {
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', confirm: '' })
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const register = useUserStore((state) => state.register)
   const isLoading = useUserStore((state) => state.isLoading)
   const navigate = useNavigate()
@@ -19,8 +22,8 @@ const SignUp = () => {
     if (!form.firstName.trim() || !form.lastName.trim()) {
       return setError('Please enter your full name.')
     }
-    if (form.password.length < 6) {
-      return setError('Password must be at least 6 characters.')
+    if (form.password.length < 8) {
+      return setError('Password must be at least 8 characters.')
     }
     if (form.password !== form.confirm) {
       return setError('Passwords do not match.')
@@ -101,26 +104,48 @@ const SignUp = () => {
           />
 
           <label className="font-semibold opacity-70 text-sm">Password</label>
-          <input
-            type="password"
-            name="password"
-            placeholder="Min. 6 characters"
-            value={form.password}
-            onChange={handleChange}
-            required
-            className="border border-gray-200 block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60"
-          />
+          <div className="relative my-2.5">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Min. 8 characters"
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="border border-gray-200 block rounded-md px-4 py-1.5 outline-none w-full focus:border-[#7c8c7d]/60 pr-10"
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {showPassword ? <LuEyeOff size={16} /> : <LuEye size={16} />}
+            </button>
+          </div>
 
           <label className="font-semibold opacity-70 text-sm">Confirm Password</label>
-          <input
-            type="password"
-            name="confirm"
-            placeholder="Repeat your password"
-            value={form.confirm}
-            onChange={handleChange}
-            required
-            className="border border-gray-200 block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60"
-          />
+          <div className="relative my-2.5">
+            <input
+              type={showConfirm ? 'text' : 'password'}
+              name="confirm"
+              placeholder="Repeat your password"
+              value={form.confirm}
+              onChange={handleChange}
+              required
+              className="border border-gray-200 block rounded-md px-4 py-1.5 outline-none w-full focus:border-[#7c8c7d]/60 pr-10"
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowConfirm((v) => !v)}
+              aria-label={showConfirm ? 'Hide password' : 'Show password'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {showConfirm ? <LuEyeOff size={16} /> : <LuEye size={16} />}
+            </button>
+          </div>
 
           <button
             type="submit"

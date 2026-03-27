@@ -1,3 +1,4 @@
+// Entry point — loads environment variables and starts the Express server.
 import 'dotenv/config';
 import app from './app.js';
 import { config } from './config/env.js';

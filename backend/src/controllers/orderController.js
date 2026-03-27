@@ -1,4 +1,6 @@
+// Order controllers — create an order from the cart, and fetch order history for the authenticated user.
 import { supabase } from '../config/supabase.js';
+import { calculateShipping } from '../utils/shipping.js';
 
 // POST /api/orders
 // Reads the user's cart, creates an order + order_items, then clears the cart
@@ -28,11 +30,10 @@ export const createOrder = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Cart is empty.' });
     }
 
-    // 2. Calculate total amount
-    const total_amount = cartItems.reduce(
-      (sum, item) => sum + item.product.price * item.quantity,
-      0
-    );
+    // 2. Calculate total amount (products subtotal + shipping)
+    const subtotal     = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+    const shipping     = calculateShipping(subtotal);
+    const total_amount = subtotal + shipping;
 
     // 3. Insert the order
     const { data: order, error: orderError } = await supabase

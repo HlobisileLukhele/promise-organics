@@ -1,3 +1,4 @@
+// Auth routes — registration, login, profile, and password reset.
 import { Router } from 'express';
 import { register, login, getMe } from '../controllers/authController.js';
 import { forgotPassword, resetPassword } from '../controllers/passwordResetController.js';

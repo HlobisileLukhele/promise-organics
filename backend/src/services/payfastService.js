@@ -1,3 +1,4 @@
+// PayFast service — MD5 signature generation, payment payload construction, and ITN webhook verification.
 import md5 from 'md5';
 
 const SANDBOX_URL = 'https://sandbox.payfast.co.za/eng/process';

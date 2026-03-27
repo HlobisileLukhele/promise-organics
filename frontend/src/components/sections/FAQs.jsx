@@ -35,15 +35,15 @@ export default function FAQs() {
       question: "How long do your products last once opened?", 
       answer: "Our products contain no synthetic preservatives, so we recommend using them within 6-12 months of opening for maximum freshness and efficacy. Store in a cool, dry place away from direct sunlight to preserve the natural ingredients." 
     },
-    { 
-      id: 7, 
-      question: "What is your return and refund policy?", 
-      answer: "We offer a 30-day satisfaction guarantee. If you're not completely happy with your purchase, contact us within 30 days of delivery for a full refund or exchange. Products must be at least 50% full and in their original packaging. Customer satisfaction is our priority." 
+    {
+      id: 7,
+      question: "What is your return and refund policy?",
+      answer: "We accept returns only if your product arrives damaged — meaning damage that occurred before or during delivery. You must report it within 48 hours of receiving your order by emailing sales@promiseorganics.co.za with your order number, a description of the damage, and at least two clear photos. Please do not use the product. Approved refunds are processed back to your original payment method within 7–10 business days. We're unable to offer refunds for change-of-mind purchases, as all sales are final once dispatched."
     },
-    { 
-      id: 8, 
-      question: "Do you ship internationally?", 
-      answer: "Yes, we ship to select countries worldwide. Shipping costs and delivery times vary by location. Once your order is dispatched, you'll receive a tracking number via email. For international shipping inquiries, please contact our customer service team." 
+    {
+      id: 8,
+      question: "Where do you deliver?",
+      answer: "We currently deliver within South Africa only. Delivery times vary depending on your location and the courier used. Estimated timelines are shown at checkout, though these are not guaranteed — delays caused by couriers or factors outside our control can occasionally occur. We're working hard to make our products accessible to more people soon!"
     },
   ];
 

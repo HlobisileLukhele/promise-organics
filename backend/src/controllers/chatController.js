@@ -1,3 +1,4 @@
+// Chat controller — proxies messages to the Anthropic API as "Zoe", a Promise Organics support agent.
 import axios from 'axios';
 
 const SYSTEM_PROMPT = `You are Zoe, a friendly and helpful customer support agent for Promise Organics, a South African organic haircare and wellness brand.

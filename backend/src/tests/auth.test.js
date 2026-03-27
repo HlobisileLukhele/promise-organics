@@ -45,9 +45,9 @@ describe('POST /api/auth/register', () => {
   test('returns 400 when password is too short', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ full_name: 'Test User', email: 'test@test.com', password: '12345' })
+      .send({ full_name: 'Test User', email: 'test@test.com', password: '1234567' })
     expect(res.status).toBe(400)
-    expect(res.body.message).toMatch(/at least 6 characters/i)
+    expect(res.body.message).toMatch(/at least 8 characters/i)
   })
 
   test('returns 409 when email is already registered', async () => {

@@ -1,3 +1,4 @@
+// Admin controllers — order management, product CRUD, review moderation, dashboard stats, and email diagnostics.
 import { supabase } from '../config/supabase.js';
 import nodemailer from 'nodemailer';
 
@@ -23,7 +24,10 @@ export const getOrders = async (req, res) => {
     .select(`
       id, total_amount, status, created_at,
       users ( id, full_name, email ),
-      order_items ( id )
+      order_items (
+        id, quantity,
+        products:product_id ( name )
+      )
     `)
     .order('created_at', { ascending: false });
 
@@ -32,14 +36,31 @@ export const getOrders = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to fetch orders.' });
   }
 
-  const shaped = orders.map((o) => ({
-    ...o,
-    customer_name:  o.users?.full_name  || 'Guest',
-    customer_email: o.users?.email      || '—',
-    item_count:     o.order_items?.length ?? 0,
-    users:       undefined,
-    order_items: undefined,
-  }));
+  // Batch-fetch phone numbers from billing_info for all users in one query
+  const userIds = [...new Set(orders.map((o) => o.users?.id).filter(Boolean))];
+  let billingMap = {};
+  if (userIds.length > 0) {
+    const { data: billings } = await supabase
+      .from('billing_info')
+      .select('user_id, phone')
+      .in('user_id', userIds);
+    billingMap = Object.fromEntries((billings || []).map((b) => [b.user_id, b]));
+  }
+
+  const shaped = orders.map((o) => {
+    const billing = billingMap[o.users?.id];
+    return {
+      ...o,
+      customer_name:  o.users?.full_name || 'Guest',
+      customer_email: o.users?.email     || '—',
+      customer_phone: billing?.phone     || '—',
+      order_items:    (o.order_items || []).map((i) => ({
+        quantity: i.quantity,
+        name:     i.products?.name || 'Unknown product',
+      })),
+      users: undefined,
+    };
+  });
 
   res.json({ success: true, orders: shaped });
 };
@@ -51,11 +72,11 @@ export const getOrderById = async (req, res) => {
   const { data: order, error } = await supabase
     .from('orders')
     .select(`
-      id, total_amount, status, created_at,
+      id, total_amount, status, created_at, shipping_address, notes,
       users ( id, full_name, email ),
       order_items (
         id, quantity, price,
-        products ( id, name, image_url )
+        products:product_id ( id, name, image_url )
       )
     `)
     .eq('id', id)
@@ -65,7 +86,18 @@ export const getOrderById = async (req, res) => {
     return res.status(404).json({ success: false, message: 'Order not found.' });
   }
 
-  res.json({ success: true, order });
+  // Fetch billing_info for address details and phone (email comes from users table)
+  let billing = null;
+  if (order.users?.id) {
+    const { data: billingData } = await supabase
+      .from('billing_info')
+      .select('address, city, province, postal_code, phone')
+      .eq('user_id', order.users.id)
+      .single();
+    billing = billingData || null;
+  }
+
+  res.json({ success: true, order: { ...order, billing_info: billing } });
 };
 
 // PATCH /api/admin/orders/:id  (full edit: status, shipping_address, notes)
@@ -73,8 +105,6 @@ export const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, shipping_address, notes } = req.body;
-
-    console.log('Updating order:', id, 'to status:', status);
 
     if (status && !ALL_ORDER_STATUSES.includes(status)) {
       return res.status(400).json({
@@ -95,8 +125,6 @@ export const updateOrder = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Order not found.' });
     }
 
-    console.log('Order found:', order.order_number || id.slice(0, 8), 'user_id:', order.user_id);
-
     // STEP 2: Fetch customer email separately (join on update is unreliable in Supabase)
     let user = null;
     if (order.user_id) {
@@ -107,11 +135,6 @@ export const updateOrder = async (req, res) => {
         .single();
 
       user = userData;
-      console.log(
-        'Customer lookup:',
-        user ? user.email : 'NOT FOUND',
-        userError ? '| error: ' + userError.message : '',
-      );
     }
 
     // STEP 3: Update the order
@@ -131,8 +154,6 @@ export const updateOrder = async (req, res) => {
       console.error('Admin updateOrder error:', updateError.message);
       return res.status(500).json({ success: false, message: 'Failed to update order.' });
     }
-
-    console.log('Order updated successfully');
 
     // STEP 4: Send email if status changed and customer email exists
     let emailResult = { sent: false, reason: 'no_status_change' };
@@ -190,7 +211,6 @@ export const updateOrder = async (req, res) => {
 
       try {
         const info = await transporter.sendMail(mailOptions);
-        console.log('✅ Email sent to:', user.email, '| messageId:', info.messageId);
         emailResult = { sent: true, to: user.email, messageId: info.messageId };
       } catch (emailErr) {
         console.error('❌ Email failed:', {
@@ -491,11 +511,7 @@ export const testEmail = async (req, res) => {
       logger: true,
     });
 
-    console.log('🔍 EMAIL_USER:', process.env.EMAIL_USER);
-    console.log('🔍 EMAIL_PASS set:', !!process.env.EMAIL_PASS);
-
     await testTransporter.verify();
-    console.log('✅ SMTP server is ready');
 
     const info = await testTransporter.sendMail({
       from:    `"Promise Organics" <${process.env.EMAIL_USER}>`,
@@ -504,6 +520,7 @@ export const testEmail = async (req, res) => {
       text:    'If you see this, email is working!',
     });
 
+    // TODO: emailUser exposes the configured SMTP address — consider removing before going live.
     return res.json({
       success:      true,
       messageId:    info.messageId,
@@ -517,6 +534,7 @@ export const testEmail = async (req, res) => {
       response:     err.response,
       responseCode: err.responseCode,
     });
+    // TODO: error, code, response, and emailUser expose SMTP internals — scope access to admin-only or remove before going live.
     return res.status(500).json({
       success:      false,
       error:        err.message,

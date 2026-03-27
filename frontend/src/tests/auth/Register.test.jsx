@@ -21,7 +21,7 @@ describe('Register Page', () => {
     expect(screen.getByPlaceholderText('Thato')).toBeInTheDocument()           // firstName
     expect(screen.getByPlaceholderText('Mokoena')).toBeInTheDocument()         // lastName
     expect(screen.getByPlaceholderText('name@example.com')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Min. 6 characters')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Min. 8 characters')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Repeat your password')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument()
   })
@@ -33,7 +33,7 @@ describe('Register Page', () => {
     await user.type(screen.getByPlaceholderText('Thato'),            'Test')
     await user.type(screen.getByPlaceholderText('Mokoena'),          'User')
     await user.type(screen.getByPlaceholderText('name@example.com'), 'test@test.com')
-    await user.type(screen.getByPlaceholderText('Min. 6 characters'),'password123')
+    await user.type(screen.getByPlaceholderText('Min. 8 characters'),'password123')
     await user.type(screen.getByPlaceholderText('Repeat your password'), 'different')
     await user.click(screen.getByRole('button', { name: /create account/i }))
 
@@ -50,13 +50,13 @@ describe('Register Page', () => {
     await user.type(screen.getByPlaceholderText('Thato'),            'Test')
     await user.type(screen.getByPlaceholderText('Mokoena'),          'User')
     await user.type(screen.getByPlaceholderText('name@example.com'), 'test@test.com')
-    await user.type(screen.getByPlaceholderText('Min. 6 characters'),'12345')   // 5 chars
-    await user.type(screen.getByPlaceholderText('Repeat your password'), '12345')
+    await user.type(screen.getByPlaceholderText('Min. 8 characters'),'1234567')   // 7 chars
+    await user.type(screen.getByPlaceholderText('Repeat your password'), '1234567')
     await user.click(screen.getByRole('button', { name: /create account/i }))
 
     await waitFor(() => {
-      // SignUp.jsx: setError('Password must be at least 6 characters.')
-      expect(screen.getByText(/at least 6 characters/i)).toBeInTheDocument()
+      // SignUp.jsx: setError('Password must be at least 8 characters.')
+      expect(screen.getByText(/at least 8 characters/i)).toBeInTheDocument()
     })
   })
 
@@ -69,7 +69,7 @@ describe('Register Page', () => {
     await user.type(screen.getByPlaceholderText('Thato'),   ' ')
     await user.type(screen.getByPlaceholderText('Mokoena'), ' ')
     await user.type(screen.getByPlaceholderText('name@example.com'), 'test@test.com')
-    await user.type(screen.getByPlaceholderText('Min. 6 characters'),'password123')
+    await user.type(screen.getByPlaceholderText('Min. 8 characters'),'password123')
     await user.type(screen.getByPlaceholderText('Repeat your password'), 'password123')
     await user.click(screen.getByRole('button', { name: /create account/i }))
 
@@ -86,7 +86,7 @@ describe('Register Page', () => {
     await user.type(screen.getByPlaceholderText('Thato'),            'Test')
     await user.type(screen.getByPlaceholderText('Mokoena'),          'User')
     await user.type(screen.getByPlaceholderText('name@example.com'), 'newuser@test.com')
-    await user.type(screen.getByPlaceholderText('Min. 6 characters'),'password123')
+    await user.type(screen.getByPlaceholderText('Min. 8 characters'),'password123')
     await user.type(screen.getByPlaceholderText('Repeat your password'), 'password123')
     await user.click(screen.getByRole('button', { name: /create account/i }))
 

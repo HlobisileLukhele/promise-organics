@@ -1,3 +1,4 @@
+// Wishlist controllers — add, remove, and fetch saved products for the authenticated user.
 import { supabase } from '../config/supabase.js';
 
 // GET /api/wishlist

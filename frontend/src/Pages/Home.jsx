@@ -25,9 +25,9 @@ const Home = () => {
             {/* Hero Section */}
             <section className="relative min-h-screen flex items-center overflow-hidden bg-white dark:bg-[#0f1f17]">
                 {/* Decorative Background Elements - Light Brown Accents */}
-                <div className="absolute top-20 right-10 w-72 h-72 bg-[#c8a882]/8 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-20 left-10 w-96 h-96 bg-[#c8a882]/6 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#c8a882]/4 rounded-full blur-3xl"></div>
+                <div className="absolute top-20 right-10 w-72 h-72 bg-[#c8a882]/8 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="absolute bottom-20 left-10 w-96 h-96 bg-[#c8a882]/6 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#c8a882]/4 rounded-full blur-3xl pointer-events-none"></div>
                 
                 {/* Floating Leaves Decoration */}
                 <div className="absolute top-10 left-[10%] opacity-15">
@@ -156,8 +156,8 @@ const Home = () => {
             {/* Products Section */}
             <div id="products" className="py-20 bg-white dark:bg-[#0f1f17] relative overflow-hidden">
                 {/* Background Decorations */}
-                <div className="absolute top-10 right-10 w-64 h-64 bg-[#c8a882]/5 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-10 left-10 w-80 h-80 bg-[#7d9b7a]/5 rounded-full blur-3xl"></div>
+                <div className="absolute top-10 right-10 w-64 h-64 bg-[#c8a882]/5 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="absolute bottom-10 left-10 w-80 h-80 bg-[#7d9b7a]/5 rounded-full blur-3xl pointer-events-none"></div>
                 
                 <Products
                     title="Featured Products" 
@@ -168,7 +168,7 @@ const Home = () => {
             {/* Services Section */}
             <div className="bg-gradient-to-br from-[#f5f1e8] via-white to-[#faf8f5] dark:from-[#0f1f17] dark:via-[#162d20] dark:to-[#0f1f17] py-20 border-y-2 border-[#c8a882]/10 dark:border-[#2d5a3d]/30 relative overflow-hidden">
                 {/* Background Decorations */}
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#c8a882]/5 rounded-full blur-3xl"></div>
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#c8a882]/5 rounded-full blur-3xl pointer-events-none"></div>
                 
                 <div className="w-11/12 max-w-7xl mx-auto">
                     {/* Section Title */}
@@ -211,8 +211,8 @@ const Home = () => {
             {/* Top Selling Products */}
             <div className="py-20 px-20 bg-white dark:bg-[#0f1f17] relative overflow-hidden">
                 {/* Background Decorations */}
-                <div className="absolute top-20 left-10 w-72 h-72 bg-[#7d9b7a]/5 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-10 right-10 w-64 h-64 bg-[#c8a882]/5 rounded-full blur-3xl"></div>
+                <div className="absolute top-20 left-10 w-72 h-72 bg-[#7d9b7a]/5 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="absolute bottom-10 right-10 w-64 h-64 bg-[#c8a882]/5 rounded-full blur-3xl pointer-events-none"></div>
 
                 <Products
                     title="Best Sellers"

@@ -1,3 +1,4 @@
+// Billing controllers — fetch and upsert a single billing address record per user.
 import { supabase } from '../config/supabase.js';
 
 // GET /api/billing

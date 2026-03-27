@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { useUserStore } from './userStore'
+import { apiFetch } from '@/utils/api'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 const getToken = () => useUserStore.getState().token
@@ -27,7 +28,7 @@ export const useCartStore = create((set, get) => ({
     const token = getToken()
     if (token) {
       try {
-        const res = await fetch(`${API}/api/cart`, {
+        const res = await apiFetch(`${API}/api/cart`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ product_id: product.id, quantity: product.quantity || 1 }),
@@ -55,7 +56,7 @@ export const useCartStore = create((set, get) => ({
     const token = getToken()
     if (token && item?.cartItemId) {
       try {
-        await fetch(`${API}/api/cart/${item.cartItemId}`, {
+        await apiFetch(`${API}/api/cart/${item.cartItemId}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -79,7 +80,7 @@ export const useCartStore = create((set, get) => ({
     const token = getToken()
     if (token && item?.cartItemId) {
       try {
-        await fetch(`${API}/api/cart/${item.cartItemId}`, {
+        await apiFetch(`${API}/api/cart/${item.cartItemId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ quantity: safeQty }),

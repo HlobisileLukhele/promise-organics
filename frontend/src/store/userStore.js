@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { apiFetch } from '@/utils/api'
+import { useCsrfStore } from '@/store/csrfStore'
 
 // In Docker, nginx proxies /api/* to the backend container.
 // For local dev outside Docker, set VITE_API_URL=http://localhost:5000 in .env.local
@@ -18,7 +20,7 @@ export const useUserStore = create(
         const body = { full_name: `${firstName.trim()} ${lastName.trim()}`, email, password }
         console.log('[register] POST', url, body)
         try {
-          const res = await fetch(url, {
+          const res = await apiFetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
@@ -41,7 +43,7 @@ export const useUserStore = create(
         const url = `${API}/api/auth/login`
         console.log('[login] POST', url, { email })
         try {
-          const res = await fetch(url, {
+          const res = await apiFetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
@@ -50,6 +52,9 @@ export const useUserStore = create(
           console.log('[login] response', res.status, data)
           if (!res.ok) return { success: false, message: data.message || 'Login failed.' }
           set({ user: data.user, token: data.token })
+          // Rotate the CSRF token after login — the backend issued a new secret,
+          // so our pre-login token is now invalid. Fetch the fresh masked token.
+          useCsrfStore.getState().fetchToken()
           return { success: true }
         } catch (err) {
           console.error('[login] network error', err)
@@ -59,7 +64,11 @@ export const useUserStore = create(
         }
       },
 
-      logout: () => set({ user: null, token: null }),
+      logout: () => {
+        // Clear the in-memory CSRF token so the next user starts with a clean slate.
+        useCsrfStore.getState().clearToken()
+        set({ user: null, token: null })
+      },
     }),
     {
       name: 'promise-user',

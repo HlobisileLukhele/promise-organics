@@ -1,9 +1,9 @@
+// Auth controllers — user registration, login, and profile retrieval.
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { supabase } from '../config/supabase.js';
 import { config } from '../config/env.js';
 
-// JWT contains both user id and email as requested
 const signToken = (id, email) =>
   jwt.sign({ id, email }, config.jwtSecret, { expiresIn: '7d' });
 
@@ -15,8 +15,8 @@ export const register = async (req, res, next) => {
     if (!full_name || !email || !password) {
       return res.status(400).json({ success: false, message: 'full_name, email and password are required.' });
     }
-    if (password.length < 6) {
-      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' });
+    if (password.length < 8) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
     }
 
     // Check if email is already registered

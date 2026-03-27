@@ -2,10 +2,12 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useUserStore } from "@/store/userStore"
 import promiseLogo from "@/assets/promise-logo.png"
+import { LuEye, LuEyeOff } from 'react-icons/lu'
 
 const SignIn = () => {
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const login = useUserStore((state) => state.login)
   const isLoading = useUserStore((state) => state.isLoading)
   const navigate = useNavigate()
@@ -60,15 +62,26 @@ const SignIn = () => {
             <label className="font-semibold opacity-70 text-sm">Password</label>
             <Link to="/forgot-password" className="text-[#7c8c7d] text-sm hover:underline">Forgot Password?</Link>
           </div>
-          <input
-            type="password"
-            name="password"
-            placeholder=".........."
-            value={form.password}
-            onChange={handleChange}
-            required
-            className="border border-gray-200 dark:border-[#2d5a3d] dark:bg-[#162d20] dark:text-[#f0f7f2] dark:placeholder-[#7a9e85] block rounded-md px-4 py-1.5 outline-none my-2.5 w-full focus:border-[#7c8c7d]/60"
-          />
+          <div className="relative my-2.5">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder=".........."
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="border border-gray-200 dark:border-[#2d5a3d] dark:bg-[#162d20] dark:text-[#f0f7f2] dark:placeholder-[#7a9e85] block rounded-md px-4 py-1.5 outline-none w-full focus:border-[#7c8c7d]/60 pr-10"
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-[#7a9e85] dark:hover:text-[#c8dece] transition-colors"
+            >
+              {showPassword ? <LuEyeOff size={16} /> : <LuEye size={16} />}
+            </button>
+          </div>
 
           <button
             type="submit"
