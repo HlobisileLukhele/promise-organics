@@ -4,7 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useUserStore } from '@/store/userStore';
 import { calculateShipping } from '@/utils/shipping';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL || '';
 
 const formatDate = (dateStr) =>
   new Date(dateStr).toLocaleDateString('en-ZA', {
@@ -97,7 +97,7 @@ export default function OrderDetails() {
           {(order.order_items || []).map((item) => (
             <div key={item.id} className="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-[#2d5a3d] gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-14 h-14 bg-[#f7faf8] dark:bg-[#162d20] rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                <div className="w-14 h-14 bg-[#f7faf8] dark:bg-[#162d20] rounded-lg flex items-center justify-center overflow-hidden shrink-0">
                   <img
                     src={item.products?.image_url}
                     alt={item.products?.name || 'Product'}

@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { useUserStore } from './userStore'
 import { apiFetch } from '@/utils/api'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API = import.meta.env.VITE_API_URL || ''
 const getToken = () => useUserStore.getState().token
 
 export const useCartStore = create((set, get) => ({
@@ -95,7 +95,7 @@ export const useCartStore = create((set, get) => ({
     const token = getToken()
     if (!token) return
     try {
-      const res = await fetch(`${API}/api/cart`, {
+      const res = await apiFetch(`${API}/api/cart`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()

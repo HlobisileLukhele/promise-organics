@@ -138,7 +138,7 @@ export const getOrderById = async (req, res, next) => {
 
     if (itemsError) throw itemsError;
 
-    res.json({ success: true, data: { ...order, order_items } });
+    res.json({ success: true, data: { ...order, items: order_items, order_items } });
   } catch (err) {
     next(err);
   }

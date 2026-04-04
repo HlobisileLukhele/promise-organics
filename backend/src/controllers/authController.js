@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { supabase } from '../config/supabase.js';
 import { config } from '../config/env.js';
+import { rotateCsrfToken } from '../middleware/csrf.js';
 
 const signToken = (id, email) =>
   jwt.sign({ id, email }, config.jwtSecret, { expiresIn: '7d' });
@@ -73,6 +74,7 @@ export const login = async (req, res, next) => {
     }
 
     const token = signToken(user.id, user.email);
+    rotateCsrfToken(res);
 
     // Never send password_hash to the client
     const { password_hash, ...safeUser } = user;

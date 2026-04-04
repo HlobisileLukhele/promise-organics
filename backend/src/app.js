@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import { config } from './config/env.js';
+import { csrfProtect } from './middleware/csrf.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import routes from './routes/index.js';
 
@@ -27,6 +28,8 @@ app.use(cors({
 // JSON body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(csrfProtect);
 
 // Global rate limiter: 100 requests per 15 minutes per IP
 const limiter = rateLimit({

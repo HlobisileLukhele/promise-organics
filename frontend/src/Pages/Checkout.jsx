@@ -181,41 +181,34 @@ export default function Checkout() {
 
   const handlePlaceOrder = async () => {
     const authToken = useUserStore.getState().token
-    console.log('Token:', authToken ? 'Found' : 'MISSING!')
 
     try {
       setLoading(true)
-      console.log('Step 1: Creating order...')
-      const orderRes = await apiFetch('http://localhost:5000/api/orders', {
+      const orderRes = await apiFetch(`${API}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
         body: JSON.stringify({}),
       })
       const orderData = await orderRes.json()
-      console.log('Step 2: Order response:', orderData)
       if (!orderData.success) {
         alert('Failed to create order: ' + orderData.message)
         setLoading(false)
         return
       }
       const orderId = orderData.data?.id || orderData.data?.order_id
-      console.log('Step 3: Order ID:', orderId)
 
-      console.log('Step 4: Initiating Payfast payment...')
-      const paymentRes = await apiFetch('http://localhost:5000/api/payment/initiate', {
+      const paymentRes = await apiFetch(`${API}/api/payment/initiate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
         body: JSON.stringify({ order_id: orderId }),
       })
       const paymentData = await paymentRes.json()
-      console.log('Step 5: Payment response:', paymentData)
       if (!paymentData.success) {
         alert('Failed to initiate payment: ' + paymentData.message)
         setLoading(false)
         return
       }
 
-      console.log('Step 6: Redirecting to Payfast...')
       const { payfastUrl, payload } = paymentData
       if (payfastUrl) {
         window.location.href = `${payfastUrl}?${new URLSearchParams(payload).toString()}`

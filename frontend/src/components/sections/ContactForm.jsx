@@ -22,16 +22,14 @@ export default function ContactForm() {
     setErrorMessage('');
 
     const { name, email, phone, subject, message } = formData;
-    console.log('Sending contact form:', { name, email, subject, message });
 
     try {
-      const res = await apiFetch('http://localhost:5000/api/contact', {
+      const res = await apiFetch(`${API}/api/contact`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ name, email, phone, subject, message }),
       });
       const data = await res.json();
-      console.log('Contact form response:', data);
 
       if (data.success) {
         setSuccessMessage("Thank you! We'll get back to you within 24 hours.");
@@ -55,7 +53,7 @@ export default function ContactForm() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-700 to-emerald-900 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-linear-to-br from-emerald-700 to-emerald-900 flex items-center justify-center">
             <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
               <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
@@ -63,7 +61,7 @@ export default function ContactForm() {
           </div>
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-[#f0f7f2]">Get In Touch</h2>
         </div>
-        <div className="w-16 h-0.5 bg-gradient-to-r from-[#8B9D83] to-transparent"></div>
+        <div className="w-16 h-0.5 bg-linear-to-r from-[#8B9D83] to-transparent"></div>
       </div>
 
       <form className="space-y-5" onSubmit={handleSubmit}>
