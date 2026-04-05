@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { FaEye } from 'react-icons/fa';
 import { FaShippingFast } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useUserStore } from '@/store/userStore';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL || '';
 
 const formatDate = (dateStr) =>
   new Date(dateStr).toLocaleDateString('en-ZA', {

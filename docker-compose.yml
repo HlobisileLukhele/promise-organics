@@ -9,8 +9,8 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      - NODE_ENV=production
-      - CLIENT_URL=*
+      - NODE_ENV=development
+      - CLIENT_URL=http://localhost:5173,http://127.0.0.1:5173,http://localhost:3001,http://127.0.0.1:3001
     restart: unless-stopped
     networks:
       - ecommerce-network
@@ -21,26 +21,9 @@ services:
       retries: 3
       start_period: 10s
 
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        - VITE_API_URL=http://backend:5000
-        - VITE_GOOGLE_PLACES_API_KEY=${VITE_GOOGLE_PLACES_API_KEY}
-    ports:
-      - '80:80'
-    restart: unless-stopped
-    networks:
-      - ecommerce-network
-    depends_on:
-      backend:
-        condition: service_healthy
-
   admin:
     build:
       context: ./admin
-      args:
-        - VITE_API_URL=http://backend:5000
     ports:
       - '3001:80'
     restart: unless-stopped
@@ -53,4 +36,3 @@ services:
 networks:
   ecommerce-network:
     driver: bridge
-
